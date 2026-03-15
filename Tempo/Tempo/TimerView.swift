@@ -53,6 +53,8 @@ struct TimerView: View {
             
             zenMusicControl
             
+            taskControls
+            
             Spacer()
             
             // Session counter
@@ -67,6 +69,7 @@ struct TimerView: View {
         )
         .onChange(of: timerManager.mode) { _, _ in
             playModeTransitionAnimation()
+            timerManager.refreshCurrentTask()
         }
         .onChange(of: timerManager.state) { _, newState in
             if newState == .running {
@@ -87,6 +90,7 @@ struct TimerView: View {
         }
         .onAppear {
             requestNotificationPermission()
+            timerManager.refreshCurrentTask()
             if timerManager.state == .running {
                 startTimerAnimations()
             }
@@ -250,23 +254,51 @@ struct TimerView: View {
             
             // Center content
             VStack(spacing: 12) {
-                Text("Time Remaining")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .tracking(1)
-                
-                Text(timeString(from: timerManager.timeRemaining))
-                    .font(.system(size: 42, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundColor(.primary)
-                    .contentTransition(.numericText())
-                    .animation(.spring(response: 0.5), value: timerManager.timeRemaining)
-                    .scaleEffect(timerManager.state == .running ? 1.02 : 1)
-                    .animation(
-                        Animation.easeInOut(duration: 0.8)
-                            .repeatForever(autoreverses: true),
-                        value: timerManager.state == .running
-                    )
+                if timerManager.mode == .focus {
+                    if let task = timerManager.currentTask {
+                        VStack(spacing: 4) {
+                            Text("Current Task")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .tracking(1)
+                            
+                            Text(task.title)
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.primary)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.center)
+                            
+                            Text(task.requiredTimeText)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(accentColor.opacity(0.8))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(accentColor.opacity(0.1))
+                                .cornerRadius(4)
+                        }
+                        .frame(maxWidth: 200)
+                    } else {
+                        timeRemainingView
+                    }
+                } else {
+                    Text("Time Remaining")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .tracking(1)
+                    
+                    Text(timeString(from: timerManager.timeRemaining))
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundColor(.primary)
+                        .contentTransition(.numericText())
+                        .animation(.spring(response: 0.5), value: timerManager.timeRemaining)
+                        .scaleEffect(timerManager.state == .running ? 1.02 : 1)
+                        .animation(
+                            Animation.easeInOut(duration: 0.8)
+                                .repeatForever(autoreverses: true),
+                            value: timerManager.state == .running
+                        )
+                }
             }
         }
         .onAppear { glow = true }
@@ -377,6 +409,53 @@ struct TimerView: View {
             Capsule()
                 .fill(Color.gray.opacity(0.1))
         )
+    }
+    
+    private var timeRemainingView: some View {
+        VStack(spacing: 8) {
+            Text("Time Remaining")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .tracking(1)
+            
+            Text(timeString(from: timerManager.timeRemaining))
+                .font(.system(size: 42, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundColor(.primary)
+                .contentTransition(.numericText())
+                .animation(.spring(response: 0.5), value: timerManager.timeRemaining)
+                .scaleEffect(timerManager.state == .running ? 1.02 : 1)
+                .animation(
+                    Animation.easeInOut(duration: 0.8)
+                        .repeatForever(autoreverses: true),
+                    value: timerManager.state == .running
+                )
+        }
+    }
+    
+    @ViewBuilder
+    private var taskControls: some View {
+        if timerManager.mode == .focus, timerManager.currentTask != nil {
+            HStack(spacing: 12) {
+                Button(action: {
+                    timerManager.markCurrentTaskCompleted()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 14))
+                        Text("Complete Task")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(.green)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.green.opacity(0.1))
+                    .cornerRadius(16)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.top, 8)
+        }
     }
     
     // Helper for rotating dash animation

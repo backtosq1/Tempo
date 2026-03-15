@@ -11,6 +11,7 @@ struct SettingsView: View {
     
     @AppStorage("autoStartBreaks") private var autoStartBreaks = true
     @AppStorage("autoStartFocus") private var autoStartFocus = false
+    @AppStorage("autoNameSessionFromTask") private var autoNameSessionFromTask = false
     @AppStorage("enableNotifications") private var enableNotifications = true
     @AppStorage("enableSounds") private var enableSounds = true
     @AppStorage("enableZenMusic") private var enableZenMusic = false
@@ -97,6 +98,13 @@ struct SettingsView: View {
                         icon: "pause.circle.fill",
                         label: "Auto-start focus sessions",
                         isOn: $autoStartFocus,
+                        accentColor: accentColor
+                    )
+                    
+                    ToggleRow(
+                        icon: "textfield",
+                        label: "Name session from current task",
+                        isOn: $autoNameSessionFromTask,
                         accentColor: accentColor
                     )
                 }
