@@ -102,7 +102,7 @@ struct SettingsView: View {
                     )
                     
                     ToggleRow(
-                        icon: "textfield",
+                        icon: "text.badge.checkmark",
                         label: "Name session from current task",
                         isOn: $autoNameSessionFromTask,
                         accentColor: accentColor

@@ -98,7 +98,9 @@ struct TimerView: View {
     }
     
     private var sessionSelector: some View {
-        Menu {
+        let isTaskSession = settings.autoNameSessionFromTask && timerManager.currentTask != nil
+        
+        return Menu {
             ForEach(timerManager.availableSessions) { session in
                 Button(action: {
                     timerManager.setSession(session)
@@ -121,15 +123,19 @@ struct TimerView: View {
                     .frame(width: 8, height: 8)
                 Text(timerManager.currentSessionName.isEmpty ? "Select Session" : timerManager.currentSessionName)
                     .font(.system(size: 12, weight: .medium))
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 10))
+                if !isTaskSession {
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 10))
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .background(Color.gray.opacity(0.1))
             .cornerRadius(12)
+            .opacity(isTaskSession ? 0.6 : 1)
         }
         .buttonStyle(PlainButtonStyle())
+        .disabled(isTaskSession)
     }
     
     private var modeHeader: some View {
@@ -253,14 +259,22 @@ struct TimerView: View {
             }
             
             // Center content
-            VStack(spacing: 12) {
+            VStack(spacing: 8) {
                 if timerManager.mode == .focus {
                     if let task = timerManager.currentTask {
-                        VStack(spacing: 4) {
-                            Text("Current Task")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .tracking(1)
+                        VStack(spacing: 6) {
+                            Text(timeString(from: timerManager.timeRemaining))
+                                .font(.system(size: 38, weight: .bold, design: .rounded))
+                                .monospacedDigit()
+                                .foregroundColor(.primary)
+                                .contentTransition(.numericText())
+                                .animation(.spring(response: 0.5), value: timerManager.timeRemaining)
+                                .scaleEffect(timerManager.state == .running ? 1.02 : 1)
+                                .animation(
+                                    Animation.easeInOut(duration: 0.8)
+                                        .repeatForever(autoreverses: true),
+                                    value: timerManager.state == .running
+                                )
                             
                             Text(task.title)
                                 .font(.system(size: 16, weight: .semibold))

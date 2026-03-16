@@ -65,6 +65,13 @@ struct SidebarView: View {
         )
         .onAppear {
             loadTodos()
+            NotificationCenter.default.addObserver(
+                forName: .tasksDidChange,
+                object: nil,
+                queue: .main
+            ) { _ in
+                self.todos = self.settings.todos
+            }
         }
     }
     
@@ -242,7 +249,7 @@ struct SidebarView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 8)
             .padding(.top, 16)
             .onAppear {
                 todos = settings.todos
@@ -285,14 +292,14 @@ struct SidebarView: View {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.white)
-                                .padding(6)
+                                .padding(.horizontal, 6)
                                 .background(accentColor)
                                 .clipShape(Circle())
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 6)
             }
             
             // Todo list with reordering
@@ -435,7 +442,7 @@ struct SidebarView: View {
                             .transition(.opacity.combined(with: .move(edge: .top)))
                         }
                     }
-                    .padding(.horizontal, 12)
+                .padding(.horizontal, 6)
                     .padding(.vertical, 8)
                     .animation(.spring(response: 0.3, dampingFraction: 0.8), value: completedTodos.count)
                 } label: {
@@ -612,35 +619,42 @@ struct TodoRow: View {
             .buttonStyle(PlainButtonStyle())
             
             if isEditing {
-                TextField("Edit task...", text: Binding(
-                    get: { editingText },
-                    set: { onEditingTextChange($0) }
-                ))
-                .textFieldStyle(PlainTextFieldStyle())
-                .font(.system(size: 12))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(4)
-                .onSubmit { onSaveEdit() }
-                
-                Picker("", selection: Binding(
-                    get: { editingMinutes },
-                    set: { onEditingMinutesChange($0) }
-                )) {
-                    Text("None").tag(0)
-                    Text("15m").tag(15)
-                    Text("25m").tag(25)
-                    Text("30m").tag(30)
-                    Text("45m").tag(45)
-                    Text("50m").tag(50)
-                    Text("1h").tag(60)
-                    Text("1.5h").tag(90)
-                    Text("2h").tag(120)
+                VStack(alignment: .leading, spacing: 4) {
+                    TextField("Edit task...", text: Binding(
+                        get: { editingText },
+                        set: { onEditingTextChange($0) }
+                    ))
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .font(.system(size: 12))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 4)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(4)
+                    .onSubmit { onSaveEdit() }
+                    
+                    HStack(spacing: 4) {
+                        Text("Time:")
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                        
+                        Picker("", selection: Binding(
+                            get: { editingMinutes },
+                            set: { onEditingMinutesChange($0) }
+                        )) {
+                            Text("None").tag(0)
+                            Text("15m").tag(15)
+                            Text("25m").tag(25)
+                            Text("30m").tag(30)
+                            Text("45m").tag(45)
+                            Text("50m").tag(50)
+                            Text("1h").tag(60)
+                            Text("1.5h").tag(90)
+                            Text("2h").tag(120)
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .labelsHidden()
+                    }
                 }
-                .pickerStyle(MenuPickerStyle())
-                .labelsHidden()
-                .frame(width: 60)
                 
                 Button(action: onSaveEdit) {
                     Image(systemName: "checkmark")
@@ -685,7 +699,7 @@ struct TodoRow: View {
                 .buttonStyle(PlainButtonStyle())
             }
         }
-        .padding(.horizontal, 8)
+        .padding(.horizontal, 4)
         .padding(.vertical, 6)
         .background(Color.gray.opacity(0.05))
         .cornerRadius(6)

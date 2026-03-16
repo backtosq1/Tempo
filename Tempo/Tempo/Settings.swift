@@ -467,8 +467,25 @@ class TimerManager: ObservableObject {
         if let index = todos.firstIndex(where: { $0.id == task.id }) {
             todos[index].isCompleted = true
             settings.todos = todos
+            
+            stop()
+            state = .stopped
+            
+            if settings.autoNameSessionFromTask {
+                if let nextTask = settings.currentTask {
+                    currentSessionName = nextTask.title
+                    settings.currentSessionName = nextTask.title
+                } else {
+                    let defaultSession = SessionType.defaultSessions.first?.name ?? "Focus"
+                    currentSessionName = defaultSession
+                    settings.currentSessionName = defaultSession
+                }
+            }
+            
             settings.advanceToNextTask()
             loadCurrentTask()
+            
+            NotificationCenter.default.post(name: .tasksDidChange, object: nil)
         }
     }
     
