@@ -7,6 +7,7 @@ import UniformTypeIdentifiers
 struct SidebarView: View {
     @Binding var selectedTab: Int
     @Namespace private var namespace
+    @ObservedObject private var updateManager = UpdateManager.shared
     
     // @AppStorage for reactive theme color updates
     @AppStorage("themeColor") private var themeColorValue: String = "red"
@@ -518,7 +519,7 @@ struct SidebarView: View {
                 .frame(width: 6, height: 6)
                 .shadow(color: accentColor.opacity(0.5), radius: 2)
             
-            Text("v1.2.3")
+            Text("v\(updateManager.currentVersion)")
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(.secondary)
             

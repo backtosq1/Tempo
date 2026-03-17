@@ -214,7 +214,7 @@ struct SettingsView: View {
                         .buttonStyle(PlainButtonStyle())
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Tempo v1.2.3")
+                            Text("Tempo v\(updateManager.currentVersion)")
                                 .font(.caption)
                                 .fontWeight(.medium)
                         }
@@ -244,8 +244,8 @@ struct SettingsView: View {
         }
         .alert("Check for Updates", isPresented: $showingUpdateAlert) {
             if updateManager.updateAvailable {
-                Button("Download Update") {
-                    updateManager.openDownloadPage()
+                Button("Update in App Store") {
+                    updateManager.openAppStore()
                 }
                 Button("Later", role: .cancel) { }
             } else if updateManager.errorMessage != nil {

@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import StoreKit
 import Combine
 
 final class UpdateManager: ObservableObject {
@@ -9,17 +10,14 @@ final class UpdateManager: ObservableObject {
     @Published var updateAvailable: Bool = false
     @Published var latestVersion: String = ""
     @Published var releaseNotes: String = ""
-    @Published var downloadURL: String = ""
     @Published var errorMessage: String?
     
     let currentVersion: String
-    private let repoOwner: String
-    private let repoName: String
+    private let bundleId: String = "com.backtosq1.Tempo"
+    private var appStoreUrl: String = ""
     
     private init() {
         self.currentVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0"
-        self.repoOwner = "backtosq1"
-        self.repoName = "Tempo"
     }
     
     func checkForUpdates() {
@@ -27,7 +25,7 @@ final class UpdateManager: ObservableObject {
         errorMessage = nil
         updateAvailable = false
         
-        let urlString = "https://api.github.com/repos/\(repoOwner)/\(repoName)/releases/latest"
+        let urlString = "https://itunes.apple.com/lookup?bundleId=\(bundleId)"
         guard let url = URL(string: urlString) else {
             errorMessage = "Invalid URL"
             isChecking = false
@@ -35,8 +33,8 @@ final class UpdateManager: ObservableObject {
         }
         
         var request = URLRequest(url: url)
-        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         request.setValue("Tempo/1.0", forHTTPHeaderField: "User-Agent")
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         
         URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
             DispatchQueue.main.async {
@@ -54,16 +52,22 @@ final class UpdateManager: ObservableObject {
                 
                 do {
                     if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                       let tagName = json["tag_name"] as? String {
+                       let results = json["results"] as? [[String: Any]],
+                       let result = results.first {
                         
-                        let latestVersion = tagName.replacingOccurrences(of: "v", with: "")
-                        self?.latestVersion = latestVersion
-                        self?.downloadURL = json["html_url"] as? String ?? ""
-                        self?.releaseNotes = json["body"] as? String ?? ""
+                        let storeVersion = result["version"] as? String ?? ""
+                        self?.latestVersion = storeVersion
+                        self?.appStoreUrl = result["trackViewUrl"] as? String ?? ""
                         
-                        if self?.compareVersions(self?.currentVersion ?? "", latestVersion) == .orderedAscending {
+                        if let releaseNotes = result["releaseNotes"] as? String {
+                            self?.releaseNotes = releaseNotes
+                        }
+                        
+                        if self?.compareVersions(self?.currentVersion ?? "", storeVersion) == .orderedAscending {
                             self?.updateAvailable = true
                         }
+                    } else {
+                        self?.errorMessage = "App not found on App Store"
                     }
                 } catch {
                     self?.errorMessage = "Failed to parse response"
@@ -72,10 +76,40 @@ final class UpdateManager: ObservableObject {
         }.resume()
     }
     
-    func openDownloadPage() {
-        if let url = URL(string: downloadURL) {
+    func openAppStore() {
+        #if os(macOS)
+        if let url = URL(string: "macappstore://itunes.apple.com/app/id\(getAppStoreId())") {
+            NSWorkspace.shared.open(url)
+        } else if let url = URL(string: appStoreUrl) {
             NSWorkspace.shared.open(url)
         }
+        #else
+        if let url = URL(string: appStoreUrl) {
+            UIApplication.shared.open(url)
+        }
+        #endif
+    }
+    
+    private func getAppStoreId() -> String {
+        let urlString = "https://itunes.apple.com/lookup?bundleId=\(bundleId)"
+        guard let url = URL(string: urlString) else { return "" }
+        
+        var result = ""
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            if let data = data,
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let results = json["results"] as? [[String: Any]],
+               let first = results.first,
+               let trackId = first["trackId"] as? Int {
+                result = String(trackId)
+            }
+            semaphore.signal()
+        }.resume()
+        
+        _ = semaphore.wait(timeout: .now() + 5)
+        return result
     }
     
     private func compareVersions(_ v1: String, _ v2: String) -> ComparisonResult {
