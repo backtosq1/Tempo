@@ -346,6 +346,10 @@ class TimerManager: ObservableObject {
             timeRemaining = focusTimeDefault
         }
         
+        if getWeeklyData().isEmpty && settings.totalSessions == 0 {
+            seedSampleData()
+        }
+        
         checkAndResetDailyCounter()
         loadWeeklyData()
     }
@@ -446,6 +450,43 @@ class TimerManager: ObservableObject {
         resetTimer()
         startTime = nil
         resetTimerState()
+        objectWillChange.send()
+    }
+    
+    func seedSampleData() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let calendar = Calendar.current
+        let today = Date()
+        
+        var sampleWeeklyData: [DailyStat] = []
+        let sampleData: [(daysAgo: Int, sessions: Int, minutes: Double)] = [
+            (6, 4, 120),
+            (5, 6, 180),
+            (4, 3, 90),
+            (3, 5, 150),
+            (2, 7, 210),
+            (1, 4, 120),
+            (0, 2, 60)
+        ]
+        
+        for data in sampleData {
+            if let date = calendar.date(byAdding: .day, value: -data.daysAgo, to: today) {
+                let dateString = dateFormatter.string(from: date)
+                sampleWeeklyData.append(DailyStat(date: dateString, sessions: data.sessions, minutes: data.minutes))
+            }
+        }
+        
+        if let encoded = try? JSONEncoder().encode(sampleWeeklyData),
+           let jsonString = String(data: encoded, encoding: .utf8) {
+            settings.weeklyDataJSON = jsonString
+        }
+        
+        settings.totalFocusTime = 930 * 60
+        settings.totalSessions = 31
+        settings.todaySessions = 2
+        
         objectWillChange.send()
     }
     

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HelpView: View {
     @AppStorage("themeColor") private var themeColor: String = "red"
+    @ObservedObject private var updateManager = UpdateManager.shared
     
     private var accentColor: Color {
         switch themeColor {
@@ -146,7 +147,7 @@ struct HelpView: View {
                             Text("Version")
                                 .font(.system(size: 14, weight: .semibold))
                             
-                            Text("Tempo v1.2.3 - A focus timer app for macOS")
+                            Text("Tempo v\(updateManager.currentVersion) - A focus timer app for macOS. Designed for students.")
                                 .font(.system(size: 13))
                                 .foregroundColor(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
