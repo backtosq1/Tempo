@@ -108,6 +108,11 @@ final class SettingsStore: ObservableObject {
         set { defaults.set(newValue, forKey: "currentSessionName") }
     }
     
+    var autoNameSessionFromTask: Bool {
+        get { defaults.bool(forKey: "autoNameSessionFromTask") }
+        set { defaults.set(newValue, forKey: "autoNameSessionFromTask") }
+    }
+    
     var customSessions: [SessionType] {
         get {
             guard let data = defaults.data(forKey: "customSessions"),
@@ -162,6 +167,71 @@ final class SettingsStore: ObservableObject {
                 defaults.set(data, forKey: "todos")
             }
         }
+    }
+    
+    func deleteCompletedTasks() {
+        todos = todos.filter { !$0.isCompleted }
+    }
+    
+    var currentTaskIndex: Int {
+        get { defaults.integer(forKey: "currentTaskIndex") }
+        set { defaults.set(newValue, forKey: "currentTaskIndex") }
+    }
+    
+    var activeTasks: [TodoItem] {
+        todos.filter { !$0.isCompleted }
+    }
+    
+    var completedTasks: [TodoItem] {
+        todos.filter { $0.isCompleted }
+    }
+    
+    var tasksNeedingFocus: [TodoItem] {
+        activeTasks.filter { $0.requiredMinutes > 0 }
+    }
+    
+    var currentTask: TodoItem? {
+        let focusTasks = tasksNeedingFocus
+        guard !focusTasks.isEmpty else { return nil }
+        if currentTaskIndex >= focusTasks.count {
+            currentTaskIndex = 0
+        }
+        return focusTasks.first
+    }
+    
+    func setCurrentTaskIndex(to taskId: UUID) {
+        let active = activeTasks
+        if let index = active.firstIndex(where: { $0.id == taskId }) {
+            currentTaskIndex = index
+        }
+    }
+    
+    var totalTaskMinutes: Int {
+        activeTasks.reduce(0) { $0 + $1.requiredMinutes }
+    }
+    
+    var totalTaskTimeText: String {
+        let total = totalTaskMinutes
+        if total >= 60 {
+            let hours = total / 60
+            let mins = total % 60
+            if mins > 0 {
+                return "\(hours)h \(mins)m"
+            }
+            return "\(hours)h"
+        }
+        return "\(total)m"
+    }
+    
+    func advanceToNextTask() {
+        let active = activeTasks
+        if currentTaskIndex < active.count - 1 {
+            currentTaskIndex += 1
+        }
+    }
+    
+    func resetTaskIndex() {
+        currentTaskIndex = 0
     }
     
     private init() {}
@@ -230,12 +300,31 @@ struct TodoItem: Identifiable, Codable, Hashable {
     var title: String
     var isCompleted: Bool
     var createdAt: Date
+    var requiredMinutes: Int
+    var sessionId: UUID?
     
-    init(id: UUID = UUID(), title: String, isCompleted: Bool = false) {
+    init(id: UUID = UUID(), title: String, isCompleted: Bool = false, requiredMinutes: Int = 25, sessionId: UUID? = nil) {
         self.id = id
         self.title = title
         self.isCompleted = isCompleted
         self.createdAt = Date()
+        self.requiredMinutes = requiredMinutes
+        self.sessionId = sessionId
+    }
+    
+    var requiredTimeText: String {
+        if requiredMinutes == 0 {
+            return "None"
+        }
+        if requiredMinutes >= 60 {
+            let hours = requiredMinutes / 60
+            let mins = requiredMinutes % 60
+            if mins > 0 {
+                return "\(hours)h \(mins)m"
+            }
+            return "\(hours)h"
+        }
+        return "\(requiredMinutes)m"
     }
 }
 
@@ -301,6 +390,7 @@ class TimerManager: ObservableObject {
     @Published var completedSessions: Int = 0
     @Published var currentSessionName: String = ""
     @Published var availableSessions: [SessionType] = SessionType.defaultSessions
+    @Published var currentTask: TodoItem?
     
     // MARK: - Private Properties
     private let settings = SettingsStore.shared
@@ -352,6 +442,55 @@ class TimerManager: ObservableObject {
         
         checkAndResetDailyCounter()
         loadWeeklyData()
+        loadCurrentTask()
+        
+        NotificationCenter.default.addObserver(
+            forName: .tasksDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.loadCurrentTask()
+        }
+    }
+    
+    private func loadCurrentTask() {
+        currentTask = settings.currentTask
+        if settings.autoNameSessionFromTask, let task = currentTask {
+            currentSessionName = task.title
+            settings.currentSessionName = task.title
+        }
+    }
+    
+    func refreshCurrentTask() {
+        loadCurrentTask()
+    }
+    
+    func markCurrentTaskCompleted() {
+        guard let task = currentTask else { return }
+        var todos = settings.todos
+        if let index = todos.firstIndex(where: { $0.id == task.id }) {
+            todos[index].isCompleted = true
+            settings.todos = todos
+            
+            stop()
+            state = .stopped
+            
+            if settings.autoNameSessionFromTask {
+                if let nextTask = settings.currentTask {
+                    currentSessionName = nextTask.title
+                    settings.currentSessionName = nextTask.title
+                } else {
+                    let defaultSession = SessionType.defaultSessions.first?.name ?? "Focus"
+                    currentSessionName = defaultSession
+                    settings.currentSessionName = defaultSession
+                }
+            }
+            
+            settings.advanceToNextTask()
+            loadCurrentTask()
+            
+            NotificationCenter.default.post(name: .tasksDidChange, object: nil)
+        }
     }
     
     // MARK: - Public Methods
@@ -409,8 +548,13 @@ class TimerManager: ObservableObject {
     }
     
     func setSession(_ session: SessionType) {
-        currentSessionName = session.name
-        settings.currentSessionName = session.name
+        if settings.autoNameSessionFromTask, let task = settings.currentTask {
+            currentSessionName = task.title
+            settings.currentSessionName = task.title
+        } else {
+            currentSessionName = session.name
+            settings.currentSessionName = session.name
+        }
         settings.focusDuration = session.focusDuration
         settings.shortBreakDuration = session.shortBreakDuration
         settings.longBreakDuration = session.longBreakDuration
@@ -514,6 +658,9 @@ class TimerManager: ObservableObject {
                 addToWeeklyData(time: elapsedTime)
             }
             
+            // Mark current task as completed if user chose to do so
+            markCurrentTaskCompleted()
+            
             updateLastSessionDate()
             
             // Determine break type (long break every 4 sessions)
@@ -546,6 +693,7 @@ class TimerManager: ObservableObject {
         startTime = nil
         saveTimerState()
         playNotificationSound()
+        loadCurrentTask()
     }
     
     private func resetTimer() {
