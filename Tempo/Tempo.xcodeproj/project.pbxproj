@@ -276,7 +276,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = /Users/huatao/Tempo/Tempo/Tempo/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Tempo/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Tempo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Huatao Xue. All rights reserved.";
@@ -325,7 +325,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = /Users/huatao/Tempo/Tempo/Tempo/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Tempo/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Tempo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Huatao Xue. All rights reserved.";
