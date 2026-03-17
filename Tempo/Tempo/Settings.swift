@@ -346,9 +346,10 @@ class TimerManager: ObservableObject {
             timeRemaining = focusTimeDefault
         }
         
-        if getWeeklyData().isEmpty && settings.totalSessions == 0 {
-            seedSampleData()
-        }
+        ///Sample data for demos
+        // if getWeeklyData().isEmpty && settings.totalSessions == 0 {
+            // seedSampleData()
+        // }
         
         checkAndResetDailyCounter()
         loadWeeklyData()
