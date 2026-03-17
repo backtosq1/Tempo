@@ -3,7 +3,6 @@ import AppKit
 
 extension Notification.Name {
     static let openMiniPlayer = Notification.Name("openMiniPlayer")
-    static let tasksDidChange = Notification.Name("tasksDidChange")
 }
 
 @main
