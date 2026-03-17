@@ -1,65 +1,90 @@
 # Tempo
 
-![Version](https://img.shields.io/badge/Version-1.2.3-red.svg) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-1.2.4-red?style=for-the-badge" alt="Version">
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/Platform-macOS-black?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Swift-5.9-orange?style=for-the-badge" alt="Swift Version">
+  <img src="https://img.shields.io/badge/Checks-passed-green?style=for-the-badge" alt="Checks"></a>
+</p>
 
-A focus timer for students. Level up your work with a customizable systematic focus routine, focus statistics, and more!
-
-## 🍅 How does it work?
-
-Tempo makes use of the popular [pomodoro technique](https://en.wikipedia.org/wiki/Pomodoro_Technique), which is a time management technique developed in the 1980s.
-
-A typical pomodoro (Italian for "tomato") technique consists of a **25 min** focus session, a short **5 min** break, then looping back to the 25 min session until 4 focus sessions are done. Then, take a long **15 min** break. After that, the cycle repeats itself.
+<p align="center">
+  <strong>A focus timer for students.</strong><br>
+  Level up your work with a customizable systematic focus routine, focus statistics, and more!
+</p>
 
 ---
 
-## What's New in v1.2.3 update
+## How does it work?
+
+Tempo makes use of the popular [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique), a time management technique developed in the 1980s.
+
+A typical **pomodoro** (Italian for "tomato") technique consists of:
+
+| Session | Duration |
+|---------|----------|
+| Focus   | 25 min   |
+| Short Break | 5 min |
+| Focus   | 25 min   |
+| Short Break | 5 min |
+| Focus   | 25 min   |
+| Short Break | 5 min |
+| Focus   | 25 min   |
+| Long Break | 15 min |
+
+---
+
+## What's New in v1.2.4
 
 ### New Features
 
-- **Theme Color Lock** - New setting to keep your preferred theme color when switching between different session types (Focus, Deep Work, Quick)
-- **Zen Music** - Ambient "Inner Peace" music by "Grand_Projet" (Pixabay) plays automatically during focus sessions (toggle in Settings)
-- **Todo List** - Added todo list support in sidebar. You an add, edit, delete, and mark done todo items.
-- **Help & About** - Redesigned help section with comprehensive guides and credits
+**Tempo is on the App Store!!!**
 
-**If you find this project useful, please star this repository⭐️❤️**
+Download the app from either the app store or from the releases tab (a warning no longer appears when you first open it!)
+
+Update detection has also been tweaked, and some bugs were patched.
 
 ---
 
-## 🔨 How to install
+## Installation
 
-Download the .dmg file from the latest release (go to the Releases tab), and then drag the app into the Applications folder.
+### Download
+
+Download it from the app store or download the `.dmg` file from the [latest release](https://github.com/your-repo/releases) and drag the app into the Applications folder.
 
 
-### ⚠️ Important!
+### Required Permissions
 
-I don't have an Apple Developer account, which means that when opening the app, your Mac will say something like:
-
-```"Tempo" can't be opened because Apple cannot check it for malicious software. This software needs to be updated. Contact the developer for more information.```
-
-You will have to go to System Settings/Privacy and Security and manually install the app.
-
-### 🔧 App Permissions
-
-In order for the app to fully work, you will need to allow **accessibility permissions** and **notifications permissions** for the app (either through system settings or when the app first boots up).
+Grant the following permissions for full functionality:
+- **Accessibility** - For timer controls
+- **Notifications** - For focus session alerts
 
 ---
 
 ## FAQ
 
-- **Q**: Why can't I open the app? Is this software malicious?
+**Q: Is Tempo free?**
 
-- **A**: Rest assured - this project is **fully open-source** and is not malicious. The reason for this is Apple's System Integrity Protection (SIP). Since I don't have a paid Apple Developer account, SIP will prevent you from opening the app, so you will need to go to System Settings and **manually open it** (requires system admin password). You only need to do this **once**.
+A: Yes, Tempo is **100% free** and open-source.
 
+**Q: Notifications aren't working / features unavailable?**
 
-- **Q**: Is Tempo free?
+A: Check that **accessibility** and **notification** permissions are enabled. Try restarting the app. If the issue persists, please open an issue in this repository.
 
-- **A**: Yes, Tempo is 100% **free** and fully open-source.
+**Q: How can I contribute to this project?**
 
+A: Fork this repository and submit a PR for us to review.
 
-- **Q**: Tempo isn't sending focus notifications/I can't use some features?
-
-- **A**: Check if you enabled **accessbility** and **notification** permissions for Tempo. Then, try restarting the app. If there really is a bug, kindly contribute to the **Issues** section in this GitHub repository. 
+---
 
 ## License
 
-This project is licensed under the terms of the MIT License.
+This project is licensed under the [MIT License](https://opensource.org/license/mit/).
+
+---
+
+**Created by Huatao Xue**
+
+<p align="center">
+  <a href="https://github.com/your-repo">Star</a> ⭐️ · <a href="https://github.com/your-repo/issues">Issues</a>
+</p>

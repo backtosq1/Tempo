@@ -84,6 +84,11 @@ struct HelpView: View {
                             title: "Keep Your Theme Color",
                             description: "In Settings, enable 'Keep theme color when switching sessions' to prevent the color from changing when you select different session types."
                         )
+                        HelpItem(
+                            number: "5",
+                            title: "Todo-list in the sidebar",
+                            description: "Take full advantage of the convenient todo-list in the sidebar! Add todo items, double-click to edit todo items, and check the circle when you're done with them!"
+                        )
                     }
                 }
                 
