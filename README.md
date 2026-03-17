@@ -15,7 +15,7 @@
 
 ---
 
-## How does it work?
+## 🍅 How does it work?
 
 Tempo makes use of the popular [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique), a time management technique developed in the 1980s.
 
@@ -34,7 +34,18 @@ A typical **pomodoro** (Italian for "tomato") technique consists of:
 
 ---
 
-## What's New in v1.2.4
+## ⏰ Features
+
+- Pomodoro focus timer (with cool animations!)
+- Focus session presets (Focus/Deep Work/Quick)
+- Statistics page (track your progress, stats, and streaks!)
+- Mini Player (floats on top of windows for quick viewing)
+- Full customization (including: theme color, zen background music, auto-start breaks, etc.)
+- Todo-list support (add, edit, delete, and check your todo items!)
+
+---
+
+## 💡 What's New in v1.2.4
 
 ### New Features
 
@@ -46,14 +57,14 @@ Update detection has also been tweaked, and some bugs were patched.
 
 ---
 
-## Installation
+## 🔨 Installation
 
 ### Download
 
 Download it from the app store or download the `.dmg` file from the [latest release](https://github.com/your-repo/releases) and drag the app into the Applications folder.
 
 
-### Required Permissions
+### 🔧 Required Permissions
 
 Grant the following permissions for full functionality:
 - **Accessibility** - For timer controls
@@ -61,7 +72,7 @@ Grant the following permissions for full functionality:
 
 ---
 
-## FAQ
+## 💬 FAQ
 
 **Q: Is Tempo free?**
 
@@ -85,6 +96,5 @@ This project is licensed under the [MIT License](https://opensource.org/license/
 
 **Created by Huatao Xue**
 
-<p align="center">
-  <a href="https://github.com/your-repo">Star</a> ⭐️ · <a href="https://github.com/your-repo/issues">Issues</a>
-</p>
+
+Pls leave a star! ⭐️ It motivates me a lot to make your experience better.
