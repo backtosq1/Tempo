@@ -4,7 +4,6 @@
   <img src="https://img.shields.io/badge/Version-1.2.4-red?style=for-the-badge" alt="Version">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/Platform-macOS-black?style=for-the-badge" alt="Platform">
-  <img src="https://img.shields.io/badge/Swift-5.9-orange?style=for-the-badge" alt="Swift Version">
   <img src="https://img.shields.io/badge/Checks-passed-green?style=for-the-badge" alt="Checks"></a>
 </p>
 
