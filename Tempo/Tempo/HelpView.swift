@@ -1,237 +1,332 @@
 import SwiftUI
 
 struct HelpView: View {
-    @AppStorage("themeColor") private var themeColor: String = "red"
+    @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColor: String = "red"
+    @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme: String = "default"
     @ObservedObject private var updateManager = UpdateManager.shared
-    
-    private var accentColor: Color {
-        switch themeColor {
-        case "red": return .red
-        case "blue": return .blue
-        case "green": return .green
-        case "orange": return .orange
-        case "purple": return .purple
-        default: return .red
-        }
-    }
-    
+
+    private var accentColor: Color { themeColor.themeColor }
+    private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 30) {
-                // Header
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Help & About")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    Text("How to use Tempo")
+            VStack(alignment: .leading, spacing: 24) {
+                // Hero Header
+                VStack(spacing: 12) {
+                    Image(nsImage: NSApp.applicationIconImage)
+                        .resizable()
+                        .frame(width: 64, height: 64)
+                        .cornerRadius(14)
+                        .shadow(color: accentColor.opacity(0.3), radius: 8, y: 4)
+
+                    Text("Tempo")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+
+                    Text("v\(updateManager.currentVersion)")
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundColor(.secondary)
+
+                    Text("A focus timer designed for students")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.top, 20)
+                .padding(.bottom, 4)
 
-            // How to Use
-            HelpSection(title: "Getting Started", icon: "questionmark.circle.fill") {
-                    VStack(alignment: .leading, spacing: 16) {
-                        HelpItem(
-                            number: "1",
-                            title: "Start a Focus Session",
-                            description: "Click the play button in the center of the timer, or press the Space bar on your keyboard. The default focus duration is 25 minutes."
+                // Features Grid
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionLabel(text: "Features")
+
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.flexible(), spacing: 12)
+                    ], spacing: 12) {
+                        FeatureCard(
+                            icon: "timer",
+                            title: "Focus Timer",
+                            description: "Pomodoro sessions with focus, short break, and long break cycles",
+                            accent: accentColor,
+                            theme: theme
                         )
-                        
-                        HelpItem(
-                            number: "2",
-                            title: "Work Until the Timer Ends",
-                            description: "Focus on your task until the timer completes. Avoid distractions during this time for maximum productivity."
+                        FeatureCard(
+                            icon: "rectangle.stack",
+                            title: "Session Presets",
+                            description: "Focus (25m), Deep Work (50m), Quick (15m), or create your own",
+                            accent: accentColor,
+                            theme: theme
                         )
-                        
-                        HelpItem(
-                            number: "3",
-                            title: "Take a Break",
-                            description: "When the focus session ends, you'll automatically transition to a short break (5 minutes). After completing 4 focus sessions, you'll get a long break (15 minutes)."
+                        FeatureCard(
+                            icon: "music.note",
+                            title: "Zen Music",
+                            description: "Ambient music that auto-plays during focus and pauses on breaks",
+                            accent: accentColor,
+                            theme: theme
                         )
-                        
-                        HelpItem(
-                            number: "4",
-                            title: "Repeat the Cycle",
-                            description: "Continue alternating between focus sessions and breaks. Each set of 4 focus sessions earns you a longer break."
+                        FeatureCard(
+                            icon: "checklist",
+                            title: "Todo List",
+                            description: "Manage tasks with priorities, link them to sessions, and track progress",
+                            accent: accentColor,
+                            theme: theme
                         )
-                    }
-                }
-                
-                // Customizing Tempo
-                HelpSection(title: "Customizing Your Sessions", icon: "slider.horizontal.3") {
-                    VStack(alignment: .leading, spacing: 16) {
-                        HelpItem(
-                            number: "1",
-                            title: "Choose a Session Type",
-                            description: "Click the session selector dropdown to choose between Focus (25 min), Deep Work (50 min), or Quick (15 min) sessions."
+                        FeatureCard(
+                            icon: "chart.bar",
+                            title: "Statistics",
+                            description: "Daily, weekly, and monthly insights with streaks and session history",
+                            accent: accentColor,
+                            theme: theme
                         )
-                        
-                        HelpItem(
-                            number: "2",
-                            title: "Adjust Session Durations",
-                            description: "In Settings, you can customize focus duration (5-60 min), short break (1-15 min), and long break (5-30 min)."
+                        FeatureCard(
+                            icon: "trophy",
+                            title: "Achievements",
+                            description: "12 unlockable milestones like Early Bird, Streak Master, and more",
+                            accent: accentColor,
+                            theme: theme
                         )
-                        
-                        HelpItem(
-                            number: "3",
-                            title: "Auto-Start Options",
-                            description: "Enable 'Auto-start breaks' to automatically begin breaks after focus sessions. Enable 'Auto-start focus' to begin the next focus session after a break."
+                        FeatureCard(
+                            icon: "pip",
+                            title: "Mini Player",
+                            description: "Compact floating timer that stays on top across all spaces",
+                            accent: accentColor,
+                            theme: theme
                         )
-                        
-                        HelpItem(
-                            number: "4",
-                            title: "Keep Your Theme Color",
-                            description: "In Settings, enable 'Keep theme color when switching sessions' to prevent the color from changing when you select different session types."
-                        )
-                        HelpItem(
-                            number: "5",
-                            title: "Todo-list in the sidebar",
-                            description: "Take full advantage of the convenient todo-list in the sidebar! Add todo items, double-click to edit todo items, and check the circle when you're done with them!"
-                        )
-                    }
-                }
-                
-                // Zen Music
-                HelpSection(title: "Zen Music", icon: "music.note") {
-                    VStack(alignment: .leading, spacing: 16) {
-                        HelpItem(
-                            number: "1",
-                            title: "Enable Zen Music",
-                            description: "Go to Settings and toggle 'Enable zen music during focus' to turn on ambient music during your focus sessions."
-                        )
-                        
-                        HelpItem(
-                            number: "2",
-                            title: "How It Works",
-                            description: "When enabled, zen music will automatically start when you begin a focus session and stop when you take a break or stop the timer. Just remember not to accidentally play it at full blast ;)"
-                        )
-                        
-                        HelpItem(
-                            number: "3",
-                            title: "Manual Control",
-                            description: "You can also manually play/pause the music using the control that appears below the timer."
+                        FeatureCard(
+                            icon: "paintpalette",
+                            title: "Themes & Colors",
+                            description: "5 app themes, 12 accent colors, and 3 animation styles",
+                            accent: accentColor,
+                            theme: theme
                         )
                     }
                 }
-                
+
+                // Quick Start
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionLabel(text: "Quick Start")
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        QuickStartRow(step: "1", text: "Press Space to start a focus session", isLast: false, accent: accentColor, theme: theme)
+                        QuickStartRow(step: "2", text: "Work until the timer ends — a break starts automatically", isLast: false, accent: accentColor, theme: theme)
+                        QuickStartRow(step: "3", text: "Every 4 sessions, enjoy a longer break", isLast: false, accent: accentColor, theme: theme)
+                        QuickStartRow(step: "4", text: "Track your progress in Statistics and unlock Achievements", isLast: true, accent: accentColor, theme: theme)
+                    }
+                    .padding(16)
+                    .background(theme.cardBackground)
+                    .cornerRadius(12)
+                    .shadow(color: theme.cardShadow, radius: theme.shadowRadius / 2, y: 2)
+                }
+
                 // Keyboard Shortcuts
-                HelpSection(title: "Keyboard Shortcuts", icon: "keyboard.fill") {
-                    VStack(spacing: 12) {
-                        ShortcutRow(keys: "Space", action: "Start or pause the timer")
-                        ShortcutRow(keys: "⌘+R", action: "Stop and reset the timer")
-                        ShortcutRow(keys: "⌘+S", action: "Skip to the next session (focus/break)")
-                        ShortcutRow(keys: "⌘+M", action: "Open the Mini Player window")
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionLabel(text: "Keyboard Shortcuts")
+
+                    VStack(spacing: 0) {
+                        ShortcutRow(keys: "Space", action: "Start / Pause timer")
+                        Divider().padding(.horizontal, 12)
+                        ShortcutRow(keys: "⌘ R", action: "Stop and reset")
+                        Divider().padding(.horizontal, 12)
+                        ShortcutRow(keys: "⌘ S", action: "Skip to next session")
+                        Divider().padding(.horizontal, 12)
+                        ShortcutRow(keys: "⌘ M", action: "Open Mini Player")
                     }
+                    .padding(.vertical, 4)
+                    .background(theme.cardBackground)
+                    .cornerRadius(12)
+                    .shadow(color: theme.cardShadow, radius: theme.shadowRadius / 2, y: 2)
                 }
-                
+
                 // Credits
-                HelpSection(title: "Credits", icon: "heart.fill") {
-                    VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Zen Music")
-                                .font(.system(size: 14, weight: .semibold))
-                            
-                            Text("The ambient music used in Tempo is \"Inner Peace\" by \"Grand_Project\" from Pixabay. Licensed under the Pixabay Content License - free for commercial use with no attribution required.")
-                                .font(.system(size: 13))
-                                .foregroundColor(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("App Icon")
-                                .font(.system(size: 14, weight: .semibold))
-                            
-                            Text("Created by Backtosq1.")
-                                .font(.system(size: 13))
-                                .foregroundColor(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Version")
-                                .font(.system(size: 14, weight: .semibold))
-                            
-                            Text("Tempo v\(updateManager.currentVersion) - A focus timer app for macOS. Designed for students.")
-                                .font(.system(size: 13))
-                                .foregroundColor(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionLabel(text: "Credits")
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        CreditRow(label: "Zen Music", value: "\"Inner Peace\" by Grand_Project (Pixabay)")
+                        CreditRow(label: "App Icon", value: "Created by Backtosq1")
                     }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(theme.cardBackground)
+                    .cornerRadius(12)
+                    .shadow(color: theme.cardShadow, radius: theme.shadowRadius / 2, y: 2)
                 }
-                
-                Spacer()
-                    .frame(height: 40)
+
+                Spacer().frame(height: 30)
             }
             .padding(.horizontal)
         }
-        .background(Color(.windowBackgroundColor))
+        .background(theme.background)
+    }
+}
+
+// MARK: - Components
+
+private struct SectionLabel: View {
+    let text: String
+
+    var body: some View {
+        Text(text.uppercased())
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundColor(.secondary)
+            .tracking(0.8)
+    }
+}
+
+private struct FeatureCard: View {
+    let icon: String
+    let title: String
+    let description: String
+    let accent: Color
+    let theme: ThemeColors
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(accent)
+
+            Text(title)
+                .font(.system(size: 14, weight: .semibold))
+
+            Text(description)
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(3)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: 110, alignment: .topLeading)
+        .background(theme.cardBackground)
+        .cornerRadius(12)
+        .shadow(color: theme.cardShadow, radius: theme.shadowRadius / 2, y: 2)
+    }
+}
+
+private struct QuickStartRow: View {
+    let step: String
+    let text: String
+    let isLast: Bool
+    let accent: Color
+    let theme: ThemeColors
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(spacing: 0) {
+                Text(step)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 22, height: 22)
+                    .background(accent)
+                    .clipShape(Circle())
+
+                if !isLast {
+                    Rectangle()
+                        .fill(accent.opacity(0.2))
+                        .frame(width: 2)
+                        .padding(.vertical, 2)
+                }
+            }
+
+            Text(text)
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+                .padding(.top, 2)
+                .padding(.bottom, isLast ? 0 : 12)
+
+            Spacer()
+        }
+    }
+}
+
+private struct CreditRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(label)
+                .font(.system(size: 13, weight: .medium))
+                .frame(width: 80, alignment: .leading)
+
+            Text(value)
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
+struct ShortcutRow: View {
+    let keys: String
+    let action: String
+
+    var body: some View {
+        HStack {
+            Text(keys)
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundColor(.primary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.gray.opacity(0.12))
+                .cornerRadius(6)
+
+            Spacer()
+
+            Text(action)
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
     }
 }
 
 struct HelpSection<Content: View>: View {
     let title: String
     let icon: String
-    @AppStorage("themeColor") private var themeColor: String = "red"
-    
-    private var accentColor: Color {
-        switch themeColor {
-        case "red": return .red
-        case "blue": return .blue
-        case "green": return .green
-        case "orange": return .orange
-        case "purple": return .purple
-        default: return .red
-        }
-    }
-    
+    @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColor: String = "red"
+    @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme: String = "default"
+
+    private var accentColor: Color { themeColor.themeColor }
+    private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
+
     let content: Content
-    
+
     init(title: String, icon: String, @ViewBuilder content: () -> Content) {
         self.title = title
         self.icon = icon
         self.content = content()
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(accentColor)
-                
+
                 Text(title)
                     .font(.headline)
             }
-            
+
             content
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.windowBackgroundColor))
+        .background(theme.cardBackground)
         .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, y: 2)
+        .shadow(color: theme.cardShadow, radius: theme.shadowRadius / 2, y: 2)
     }
 }
 
 struct HelpItem: View {
-    @AppStorage("themeColor") private var themeColor: String = "red"
-    
-    private var accentColor: Color {
-        switch themeColor {
-        case "red": return .red
-        case "blue": return .blue
-        case "green": return .green
-        case "orange": return .orange
-        case "purple": return .purple
-        default: return .red
-        }
-    }
-    
+    @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColor: String = "red"
+
+    private var accentColor: Color { themeColor.themeColor }
+
     let number: String
     let title: String
     let description: String
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Text(number)
@@ -240,11 +335,11 @@ struct HelpItem: View {
                 .frame(width: 24, height: 24)
                 .background(accentColor)
                 .clipShape(Circle())
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 14, weight: .semibold))
-                
+
                 Text(description)
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
@@ -254,38 +349,15 @@ struct HelpItem: View {
     }
 }
 
-struct ShortcutRow: View {
-    let keys: String
-    let action: String
-    
-    var body: some View {
-        HStack {
-            Text(keys)
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
-                .foregroundColor(.primary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color.gray.opacity(0.15))
-                .cornerRadius(6)
-            
-            Text(action)
-                .font(.system(size: 13))
-                .foregroundColor(.secondary)
-            
-            Spacer()
-        }
-    }
-}
-
 struct TipItem: View {
     let text: String
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "checkmark.circle.fill")
                 .foregroundColor(.green)
                 .font(.system(size: 14))
-            
+
             Text(text)
                 .font(.system(size: 13))
                 .foregroundColor(.secondary)

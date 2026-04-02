@@ -2,33 +2,34 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var timerManager: TimerManager
-    
+    @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme = "default"
+    @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColorValue = "red"
+
     @State private var selectedTab: Int = 0
-    
+
     private var settings: SettingsStore {
         SettingsStore.shared
     }
-    
-    private var accentColor: Color {
-        Color(settings.themeColor)
-    }
-    
+
+    private var accentColor: Color { themeColorValue.themeColor }
+    private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
+
     var body: some View {
         NavigationView {
             SidebarView(selectedTab: $selectedTab)
                 .frame(minWidth: 180, idealWidth: 200, maxWidth: 220)
-            
+
             mainContentView
         }
     }
-    
+
     @ViewBuilder
     private var mainContentView: some View {
         GeometryReader { geometry in
             ZStack {
-                Color(.windowBackgroundColor)
+                theme.background
                     .ignoresSafeArea()
-                
+
                 Group {
                     switch selectedTab {
                     case 0:
@@ -49,7 +50,7 @@ struct ContentView: View {
             }
         }
     }
-    
+
     private func resetSettings() {
         settings.focusDuration = 25
         settings.shortBreakDuration = 5
@@ -60,6 +61,8 @@ struct ContentView: View {
         settings.enableSounds = true
         settings.themeColor = "red"
         settings.enableZenMusic = false
+        settings.appTheme = "default"
+        settings.appAppearance = "system"
     }
 }
 

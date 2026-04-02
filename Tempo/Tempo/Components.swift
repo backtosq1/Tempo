@@ -10,28 +10,29 @@ struct StatCard: View {
     let icon: String
     let color: Color
     let animationDelay: Double
+    var themeColors: ThemeColors = .default
     @State private var appear = false
-    
+
     var body: some View {
         VStack(spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(themeColors.textSecondary)
                         .fontWeight(.medium)
-                    
+
                     Text(value)
                         .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                    
+                        .foregroundColor(themeColors.textPrimary)
+
                     Text(subtitle)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(themeColors.textSecondary)
                 }
-                
+
                 Spacer()
-                
+
                 Image(systemName: icon)
                     .font(.title2)
                     .foregroundColor(color)
@@ -40,9 +41,9 @@ struct StatCard: View {
             }
             .padding(20)
         }
-        .background(Color(.windowBackgroundColor))
+        .background(themeColors.cardBackground)
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, y: 5)
+        .shadow(color: themeColors.cardShadow, radius: themeColors.shadowRadius, y: 5)
         .scaleEffect(appear ? 1 : 0.8)
         .opacity(appear ? 1 : 0)
         .onAppear {
@@ -59,7 +60,11 @@ struct InsightCard: View {
     let description: String
     let icon: String
     let color: Color
-    
+    var themeColors: ThemeColors = .default
+    var animationDelay: Double = 0
+
+    @State private var appear = false
+
     var body: some View {
         HStack(spacing: 15) {
             Image(systemName: icon)
@@ -68,20 +73,28 @@ struct InsightCard: View {
                 .frame(width: 40, height: 40)
                 .background(color)
                 .clipShape(Circle())
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(themeColors.textPrimary)
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(themeColors.textSecondary)
             }
-            
+
             Spacer()
         }
         .padding(12)
-        .background(Color.gray.opacity(0.05))
+        .background(themeColors.cardBackground.opacity(0.5))
         .cornerRadius(12)
+        .offset(x: appear ? 0 : -20)
+        .opacity(appear ? 1 : 0)
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(animationDelay)) {
+                appear = true
+            }
+        }
     }
 }
 
@@ -135,15 +148,21 @@ struct SettingsSection<Content: View>: View {
     let title: String
     let icon: String
     var accentColor: Color = .blue
+    var themeColors: ThemeColors = .default
+    var animationDelay: Double = 0
     let content: Content
-    
-    init(title: String, icon: String, accentColor: Color = .blue, @ViewBuilder content: () -> Content) {
+
+    @State private var appear = false
+
+    init(title: String, icon: String, accentColor: Color = .blue, themeColors: ThemeColors = .default, animationDelay: Double = 0, @ViewBuilder content: () -> Content) {
         self.title = title
         self.icon = icon
         self.accentColor = accentColor
+        self.themeColors = themeColors
+        self.animationDelay = animationDelay
         self.content = content()
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 10) {
@@ -152,16 +171,24 @@ struct SettingsSection<Content: View>: View {
                     .foregroundColor(accentColor)
                 Text(title)
                     .font(.headline)
+                    .foregroundColor(themeColors.textPrimary)
                 Spacer()
             }
-            
+
             VStack(spacing: 20) {
                 content
             }
             .padding(20)
-            .background(Color(.windowBackgroundColor))
+            .background(themeColors.cardBackground)
             .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.05), radius: 10, y: 5)
+            .shadow(color: themeColors.cardShadow, radius: themeColors.shadowRadius, y: 5)
+        }
+        .scaleEffect(appear ? 1 : 0.95)
+        .opacity(appear ? 1 : 0)
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(animationDelay)) {
+                appear = true
+            }
         }
     }
 }
@@ -223,7 +250,9 @@ struct ThemeColorButton: View {
     let name: String
     let isSelected: Bool
     let action: () -> Void
-    
+
+    @State private var isHovered = false
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: 8) {
@@ -239,17 +268,236 @@ struct ThemeColorButton: View {
                         Image(systemName: "checkmark")
                             .font(.system(size: 12, weight: .bold))
                             .foregroundColor(.white)
+                            .scaleEffect(isSelected ? 1 : 0.5)
                             .opacity(isSelected ? 1 : 0)
                     )
                     .shadow(color: color.opacity(isSelected ? 0.5 : 0.1), radius: isSelected ? 4 : 2)
-                    .scaleEffect(isSelected ? 1.1 : 1)
-                
+                    .scaleEffect(isSelected ? 1.1 : (isHovered ? 1.05 : 1))
+
                 Text(name)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(isSelected ? .primary : .secondary)
             }
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHovered)
         }
         .buttonStyle(PlainButtonStyle())
         .frame(maxWidth: .infinity)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+    }
+}
+
+// MARK: - ThemePreviewButton Component
+struct ThemePreviewButton: View {
+    let theme: AppTheme
+    let accent: Color
+    let isSelected: Bool
+    let action: () -> Void
+
+    @State private var appear = false
+    @State private var isHovered = false
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(theme.colors(accent: accent).background)
+
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(theme.colors(accent: accent).cardBackground)
+                        .frame(width: 50, height: 28)
+                        .shadow(color: theme.colors(accent: accent).cardShadow, radius: 2)
+
+                    Circle()
+                        .fill(accent)
+                        .frame(width: 12, height: 12)
+                        .offset(y: -8)
+
+                    // Checkmark badge
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(accent)
+                            .background(Circle().fill(Color.white).frame(width: 12, height: 12))
+                            .offset(x: 30, y: -22)
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                }
+                .frame(height: 60)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(isSelected ? accent : Color.gray.opacity(0.2), lineWidth: isSelected ? 2 : 1)
+                )
+                .scaleEffect(isSelected ? 1.05 : (isHovered ? 1.02 : 1))
+
+                Text(theme.displayName)
+                    .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                    .foregroundColor(isSelected ? accent : .secondary)
+            }
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHovered)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .scaleEffect(appear ? 1 : 0.9)
+        .opacity(appear ? 1 : 0)
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(Double(theme.hashValue % 5) * 0.05)) {
+                appear = true
+            }
+        }
+        .onHover { hovering in
+            isHovered = hovering
+        }
+    }
+}
+
+// MARK: - AchievementCard Component
+struct AchievementCard: View {
+    let achievement: Achievement
+    let accentColor: Color
+    var themeColors: ThemeColors = .default
+
+    @State private var appear = false
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(achievement.isUnlocked ? accentColor.opacity(0.15) : Color.gray.opacity(0.1))
+                    .frame(width: 50, height: 50)
+                Image(systemName: achievement.icon)
+                    .font(.title3)
+                    .foregroundColor(achievement.isUnlocked ? accentColor : .gray)
+            }
+
+            Text(achievement.title)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(achievement.isUnlocked ? themeColors.textPrimary : themeColors.textSecondary)
+                .lineLimit(1)
+
+            if achievement.isUnlocked, let date = achievement.unlockedDate {
+                Text(date, style: .date)
+                    .font(.system(size: 9))
+                    .foregroundColor(themeColors.textSecondary)
+            } else {
+                ProgressView(value: Double(achievement.progress), total: Double(achievement.goal))
+                    .tint(accentColor)
+                    .frame(width: 60)
+                Text("\(achievement.progress)/\(achievement.goal)")
+                    .font(.system(size: 9))
+                    .foregroundColor(themeColors.textSecondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .background(themeColors.cardBackground)
+        .cornerRadius(12)
+        .opacity(achievement.isUnlocked ? 1 : 0.6)
+        .scaleEffect(appear ? 1 : 0.9)
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.05)) {
+                appear = true
+            }
+        }
+    }
+}
+
+// MARK: - SessionPresetRow Component
+struct SessionPresetRow: View {
+    @Binding var session: SessionType
+    let isExpanded: Bool
+    let isDefault: Bool
+    let accentColor: Color
+    var themeColors: ThemeColors = .default
+    let onToggleExpand: () -> Void
+    let onDelete: () -> Void
+
+    let accentColors: [(id: String, name: String, color: Color)] = [
+        ("red", "Red", .red), ("blue", "Blue", .blue), ("green", "Green", .green),
+        ("orange", "Orange", .orange), ("purple", "Purple", .purple), ("pink", "Pink", .pink),
+        ("teal", "Teal", .teal), ("indigo", "Indigo", .indigo), ("yellow", "Yellow", .yellow),
+        ("mint", "Mint", .mint), ("cyan", "Cyan", .cyan), ("brown", "Brown", .brown),
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button(action: onToggleExpand) {
+                HStack(spacing: 10) {
+                    Circle()
+                        .fill(session.colorHex.themeColor)
+                        .frame(width: 10, height: 10)
+
+                    Text(session.name)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(themeColors.textPrimary)
+
+                    Spacer()
+
+                    Text("\(session.focusDuration)/\(session.shortBreakDuration)/\(session.longBreakDuration)")
+                        .font(.system(size: 12))
+                        .foregroundColor(themeColors.textSecondary)
+
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 10))
+                        .foregroundColor(themeColors.textSecondary)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+
+            if isExpanded {
+                VStack(spacing: 16) {
+                    TextField("Session Name", text: $session.name)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 13))
+                        .padding(8)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(6)
+
+                    DurationSlider(value: $session.focusDuration, label: "Focus", icon: "brain.head.profile", range: 5...120, suffix: "min", accentColor: accentColor)
+                    DurationSlider(value: $session.shortBreakDuration, label: "Short Break", icon: "cup.and.saucer", range: 1...30, suffix: "min", accentColor: accentColor)
+                    DurationSlider(value: $session.longBreakDuration, label: "Long Break", icon: "bed.double.fill", range: 5...60, suffix: "min", accentColor: accentColor)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Color")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(themeColors.textSecondary)
+
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 8) {
+                            ForEach(accentColors, id: \.id) { id, _, color in
+                                Circle()
+                                    .fill(color)
+                                    .frame(width: 24, height: 24)
+                                    .overlay(
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 9, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .opacity(session.colorHex == id ? 1 : 0)
+                                    )
+                                    .onTapGesture { session.colorHex = id }
+                            }
+                        }
+                    }
+
+                    if !isDefault {
+                        Button(action: onDelete) {
+                            HStack {
+                                Image(systemName: "trash")
+                                Text("Delete Session")
+                            }
+                            .font(.system(size: 12))
+                            .foregroundColor(.red)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
+            }
+        }
+        .padding(12)
+        .background(themeColors.cardBackground.opacity(0.3))
+        .cornerRadius(10)
     }
 }

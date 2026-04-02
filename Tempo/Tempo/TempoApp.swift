@@ -8,7 +8,9 @@ extension Notification.Name {
 @main
 struct TempoApp: App {
     @StateObject private var timerManager = TimerManager()
-    
+    @AppStorage(SettingsKeys.Appearance.appAppearance.rawValue) private var appAppearance = "system"
+    @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme = "default"
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -17,7 +19,10 @@ struct TempoApp: App {
                 .onAppear {
                     setupKeyMonitors()
                     setupNotificationObservers()
+                    applyAppearance()
                 }
+                .onChange(of: appAppearance) { _, _ in applyAppearance() }
+                .onChange(of: appTheme) { _, _ in applyAppearance() }
         }
         .windowStyle(.hiddenTitleBar)
         .commands {
@@ -28,19 +33,36 @@ struct TempoApp: App {
                     timerManager.stop()
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                
+
                 Button("Skip") {
                     timerManager.skip()
                 }
                 .keyboardShortcut("s", modifiers: .command)
-                
+
                 Divider()
-                
+
                 Button("Mini Player") {
                     openMiniPlayer()
                 }
                 .keyboardShortcut("m", modifiers: .command)
             }
+        }
+    }
+
+    private func applyAppearance() {
+        let theme = AppTheme(rawValue: appTheme) ?? .default
+        if theme.forcesDarkMode {
+            NSApp.appearance = NSAppearance(named: .darkAqua)
+            return
+        }
+        if theme.forcesLightMode {
+            NSApp.appearance = NSAppearance(named: .aqua)
+            return
+        }
+        switch AppAppearance(rawValue: appAppearance) {
+        case .light: NSApp.appearance = NSAppearance(named: .aqua)
+        case .dark: NSApp.appearance = NSAppearance(named: .darkAqua)
+        default: NSApp.appearance = nil
         }
     }
     
@@ -102,7 +124,7 @@ struct TempoApp: App {
         }
         
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 360, height: 80),
+            contentRect: NSRect(x: 0, y: 0, width: 380, height: 88),
             styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
             backing: .buffered,
             defer: false

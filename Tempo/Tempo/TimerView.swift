@@ -3,11 +3,13 @@ import UserNotifications
 
 struct TimerView: View {
     @ObservedObject var timerManager: TimerManager
-    @AppStorage("themeColor") private var themeColorValue = "red"
-    @AppStorage("focusDuration") private var focusDuration = 25
-    @AppStorage("shortBreakDuration") private var shortBreakDuration = 5
-    @AppStorage("longBreakDuration") private var longBreakDuration = 15
-    @AppStorage("enableZenMusic") private var enableZenMusic = false
+    @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColorValue = "red"
+    @AppStorage(SettingsKeys.Timer.focusDuration.rawValue) private var focusDuration = 25
+    @AppStorage(SettingsKeys.Timer.shortBreakDuration.rawValue) private var shortBreakDuration = 5
+    @AppStorage(SettingsKeys.Timer.longBreakDuration.rawValue) private var longBreakDuration = 15
+    @AppStorage(SettingsKeys.Behavior.enableZenMusic.rawValue) private var enableZenMusic = false
+    @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme = "default"
+    @AppStorage(SettingsKeys.Appearance.animationStyle.rawValue) private var animationStyle = "smooth"
     
     @StateObject private var zenPlayer = ZenMusicPlayer.shared
     
@@ -20,23 +22,18 @@ struct TimerView: View {
     
     private var settings: SettingsStore { SettingsStore.shared }
     
-    // Convert theme color string to SwiftUI Color
-    private var accentColor: Color {
-        switch themeColorValue {
-        case "red": return .red
-        case "blue": return .blue
-        case "green": return .green
-        case "orange": return .orange
-        case "purple": return .purple
-        default: return .red
-        }
-    }
+    private var accentColor: Color { themeColorValue.themeColor }
+    private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
     
     var body: some View {
         VStack(spacing: 0) {
             // Session selector
             sessionSelector
                 .padding(.top, 30)
+
+            // Task selector
+            taskSelector
+                .padding(.top, 8)
             
             // Mode header with transition animation
             modeHeader
@@ -62,7 +59,7 @@ struct TimerView: View {
         .padding(.horizontal, 30)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            Color(.windowBackgroundColor)
+            theme.background
                 .ignoresSafeArea()
         )
         .onChange(of: timerManager.mode) { _, _ in
@@ -127,7 +124,65 @@ struct TimerView: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
-    
+
+    private var activeTaskName: String? {
+        guard let taskId = timerManager.activeTaskId else { return nil }
+        return timerManager.todos.first(where: { $0.id == taskId })?.title
+    }
+
+    private var taskSelector: some View {
+        Menu {
+            Button(action: {
+                timerManager.setActiveTask(nil)
+            }) {
+                HStack {
+                    Text("No Task")
+                    if timerManager.activeTaskId == nil {
+                        Image(systemName: "checkmark")
+                    }
+                }
+            }
+
+            Divider()
+
+            ForEach(timerManager.todos.filter { !$0.isCompleted }) { todo in
+                Button(action: {
+                    timerManager.setActiveTask(todo.id)
+                }) {
+                    HStack {
+                        Circle()
+                            .fill(todo.priority.color)
+                            .frame(width: 8, height: 8)
+                        Text(todo.title)
+                        if timerManager.activeTaskId == todo.id {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "checklist")
+                    .font(.system(size: 10))
+                if let name = activeTaskName {
+                    Text("Working on: \(name)")
+                        .font(.system(size: 12, weight: .medium))
+                        .lineLimit(1)
+                } else {
+                    Text("Select Task")
+                        .font(.system(size: 12, weight: .medium))
+                }
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(12)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
     private var modeHeader: some View {
         VStack(spacing: 8) {
             Text(timerManager.mode.rawValue.uppercased())
@@ -136,12 +191,12 @@ struct TimerView: View {
                 .tracking(1.5)
                 .scaleEffect(showModeTransition ? 1.2 : 1)
                 .opacity(showModeTransition ? 0 : 1)
-                .animation(.spring(response: 0.5, dampingFraction: 0.6), value: showModeTransition)
+                .animation(AnimationProvider.spring(for: animationStyle), value: showModeTransition)
             
             Text(timeString(from: timerManager.timeRemaining))
                 .font(.system(size: 56, weight: .bold, design: .rounded))
                 .monospacedDigit()
-                .foregroundColor(.primary)
+                .foregroundColor(theme.textPrimary)
                 .scaleEffect(pulsate ? 1.05 : 1)
                 .animation(
                     Animation.easeInOut(duration: 1)
@@ -218,11 +273,11 @@ struct TimerView: View {
                 .rotationEffect(.degrees(-90))
                 .shadow(
                     color: accentColor.opacity(glow ? 0.5 : 0.2),
-                    radius: glow ? 20 : 10,
+                    radius: (glow ? 20 : 10) * theme.glowIntensity,
                     x: 0,
                     y: 0
                 )
-                .animation(.spring(response: 1, dampingFraction: 0.6), value: timerProgress)
+                .animation(AnimationProvider.springSlow(for: animationStyle), value: timerProgress)
             
             // Animated dashes for running timer
             if timerManager.state == .running {
@@ -252,13 +307,13 @@ struct TimerView: View {
             VStack(spacing: 12) {
                 Text("Time Remaining")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(theme.textSecondary)
                     .tracking(1)
-                
+
                 Text(timeString(from: timerManager.timeRemaining))
                     .font(.system(size: 42, weight: .bold, design: .rounded))
                     .monospacedDigit()
-                    .foregroundColor(.primary)
+                    .foregroundColor(theme.textPrimary)
                     .contentTransition(.numericText())
                     .animation(.spring(response: 0.5), value: timerManager.timeRemaining)
                     .scaleEffect(timerManager.state == .running ? 1.02 : 1)
@@ -353,9 +408,10 @@ struct TimerView: View {
                     zenPlayer.stop()
                 }
             }
+            .transition(.scale.combined(with: .opacity))
         }
     }
-    
+
     private var sessionCounter: some View {
         HStack(spacing: 20) {
             ForEach(0..<4) { index in

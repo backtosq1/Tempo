@@ -1,12 +1,9 @@
 //  Tempo - A Pomodoro timer app for macOS
-//  Settings.swift - Core settings and timer management
+//  Settings.swift - Core settings, data models, and helper extensions
 
 import Foundation
 import SwiftUI
 import Combine
-import AudioToolbox
-import UserNotifications
-import AVFoundation
 
 // MARK: - Settings Keys
 // Centralized keys for UserDefaults storage to avoid typos
@@ -22,17 +19,23 @@ enum SettingsKeys {
     
     enum Appearance: String, CaseIterable {
         case themeColor, overrideThemeColor, selectedTab
+        case appTheme, appAppearance, animationStyle
     }
     
     enum Session: String, CaseIterable {
-        case currentSessionName, customSessions
+        case currentSessionName, customSessions, todos, activeTaskId
     }
     
     enum Stats: String, CaseIterable {
         case totalFocusTime, totalSessions, todaySessions
         case lastSessionDate, weeklyData
+        case sessionHistory, bestStreakEver
     }
-    
+
+    enum Achievements: String, CaseIterable {
+        case achievements, zenSessionCount, earlyBirdCount, nightOwlCount
+    }
+
     enum Persistence: String, CaseIterable {
         case savedTimerState
     }
@@ -46,71 +49,91 @@ final class SettingsStore: ObservableObject {
     
     // MARK: Timer Settings
     var focusDuration: Int {
-        get { defaults.integer(forKey: "focusDuration").nonZeroOrDefault(25) }
-        set { defaults.set(newValue, forKey: "focusDuration") }
+        get { defaults.integer(forKey: SettingsKeys.Timer.focusDuration.rawValue).nonZeroOrDefault(25) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Timer.focusDuration.rawValue) }
     }
-    
+
     var shortBreakDuration: Int {
-        get { defaults.integer(forKey: "shortBreakDuration").nonZeroOrDefault(5) }
-        set { defaults.set(newValue, forKey: "shortBreakDuration") }
+        get { defaults.integer(forKey: SettingsKeys.Timer.shortBreakDuration.rawValue).nonZeroOrDefault(5) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Timer.shortBreakDuration.rawValue) }
     }
-    
+
     var longBreakDuration: Int {
-        get { defaults.integer(forKey: "longBreakDuration").nonZeroOrDefault(15) }
-        set { defaults.set(newValue, forKey: "longBreakDuration") }
+        get { defaults.integer(forKey: SettingsKeys.Timer.longBreakDuration.rawValue).nonZeroOrDefault(15) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Timer.longBreakDuration.rawValue) }
     }
-    
+
     var autoStartBreaks: Bool {
-        get { defaults.object(forKey: "autoStartBreaks") as? Bool ?? true }
-        set { defaults.set(newValue, forKey: "autoStartBreaks") }
+        get { defaults.object(forKey: SettingsKeys.Timer.autoStartBreaks.rawValue) as? Bool ?? true }
+        set { defaults.set(newValue, forKey: SettingsKeys.Timer.autoStartBreaks.rawValue) }
     }
-    
+
     var autoStartFocus: Bool {
-        get { defaults.object(forKey: "autoStartFocus") as? Bool ?? false }
-        set { defaults.set(newValue, forKey: "autoStartFocus") }
+        get { defaults.object(forKey: SettingsKeys.Timer.autoStartFocus.rawValue) as? Bool ?? false }
+        set { defaults.set(newValue, forKey: SettingsKeys.Timer.autoStartFocus.rawValue) }
     }
-    
+
     // MARK: Behavior Settings
     var enableNotifications: Bool {
-        get { defaults.object(forKey: "enableNotifications") as? Bool ?? true }
-        set { defaults.set(newValue, forKey: "enableNotifications") }
+        get { defaults.object(forKey: SettingsKeys.Behavior.enableNotifications.rawValue) as? Bool ?? true }
+        set { defaults.set(newValue, forKey: SettingsKeys.Behavior.enableNotifications.rawValue) }
     }
-    
+
     var enableSounds: Bool {
-        get { defaults.object(forKey: "enableSounds") as? Bool ?? true }
-        set { defaults.set(newValue, forKey: "enableSounds") }
+        get { defaults.object(forKey: SettingsKeys.Behavior.enableSounds.rawValue) as? Bool ?? true }
+        set { defaults.set(newValue, forKey: SettingsKeys.Behavior.enableSounds.rawValue) }
     }
-    
+
     var enableZenMusic: Bool {
-        get { defaults.object(forKey: "enableZenMusic") as? Bool ?? false }
-        set { defaults.set(newValue, forKey: "enableZenMusic") }
+        get { defaults.object(forKey: SettingsKeys.Behavior.enableZenMusic.rawValue) as? Bool ?? false }
+        set { defaults.set(newValue, forKey: SettingsKeys.Behavior.enableZenMusic.rawValue) }
     }
-    
+
     // MARK: Appearance Settings
     var themeColor: String {
-        get { defaults.string(forKey: "themeColor") ?? "red" }
-        set { defaults.set(newValue, forKey: "themeColor") }
+        get { defaults.string(forKey: SettingsKeys.Appearance.themeColor.rawValue) ?? "red" }
+        set { defaults.set(newValue, forKey: SettingsKeys.Appearance.themeColor.rawValue) }
     }
-    
+
     var overrideThemeColor: Bool {
-        get { defaults.object(forKey: "overrideThemeColor") as? Bool ?? false }
-        set { defaults.set(newValue, forKey: "overrideThemeColor") }
+        get { defaults.object(forKey: SettingsKeys.Appearance.overrideThemeColor.rawValue) as? Bool ?? false }
+        set { defaults.set(newValue, forKey: SettingsKeys.Appearance.overrideThemeColor.rawValue) }
     }
-    
+
     var selectedTab: Int {
-        get { defaults.integer(forKey: "selectedTab") }
-        set { defaults.set(newValue, forKey: "selectedTab") }
+        get { defaults.integer(forKey: SettingsKeys.Appearance.selectedTab.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Appearance.selectedTab.rawValue) }
     }
-    
+
+    var appTheme: String {
+        get { defaults.string(forKey: SettingsKeys.Appearance.appTheme.rawValue) ?? "default" }
+        set { defaults.set(newValue, forKey: SettingsKeys.Appearance.appTheme.rawValue) }
+    }
+
+    var appAppearance: String {
+        get { defaults.string(forKey: SettingsKeys.Appearance.appAppearance.rawValue) ?? "system" }
+        set { defaults.set(newValue, forKey: SettingsKeys.Appearance.appAppearance.rawValue) }
+    }
+
+    var animationStyle: String {
+        get { defaults.string(forKey: SettingsKeys.Appearance.animationStyle.rawValue) ?? "smooth" }
+        set { defaults.set(newValue, forKey: SettingsKeys.Appearance.animationStyle.rawValue) }
+    }
+
     // MARK: Session Settings
     var currentSessionName: String {
-        get { defaults.string(forKey: "currentSessionName") ?? "" }
-        set { defaults.set(newValue, forKey: "currentSessionName") }
+        get { defaults.string(forKey: SettingsKeys.Session.currentSessionName.rawValue) ?? "" }
+        set { defaults.set(newValue, forKey: SettingsKeys.Session.currentSessionName.rawValue) }
     }
-    
+
+    var activeTaskId: String? {
+        get { defaults.string(forKey: SettingsKeys.Session.activeTaskId.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Session.activeTaskId.rawValue) }
+    }
+
     var customSessions: [SessionType] {
         get {
-            guard let data = defaults.data(forKey: "customSessions"),
+            guard let data = defaults.data(forKey: SettingsKeys.Session.customSessions.rawValue),
                   let sessions = try? JSONDecoder().decode([SessionType].self, from: data) else {
                 return SessionType.defaultSessions
             }
@@ -118,40 +141,40 @@ final class SettingsStore: ObservableObject {
         }
         set {
             if let data = try? JSONEncoder().encode(newValue) {
-                defaults.set(data, forKey: "customSessions")
+                defaults.set(data, forKey: SettingsKeys.Session.customSessions.rawValue)
             }
         }
     }
-    
+
     // MARK: Statistics Settings
     var totalFocusTime: Double {
-        get { defaults.double(forKey: "totalFocusTime") }
-        set { defaults.set(newValue, forKey: "totalFocusTime") }
+        get { defaults.double(forKey: SettingsKeys.Stats.totalFocusTime.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Stats.totalFocusTime.rawValue) }
     }
-    
+
     var totalSessions: Int {
-        get { defaults.integer(forKey: "totalSessions") }
-        set { defaults.set(newValue, forKey: "totalSessions") }
+        get { defaults.integer(forKey: SettingsKeys.Stats.totalSessions.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Stats.totalSessions.rawValue) }
     }
-    
+
     var todaySessions: Int {
-        get { defaults.integer(forKey: "todaySessions") }
-        set { defaults.set(newValue, forKey: "todaySessions") }
+        get { defaults.integer(forKey: SettingsKeys.Stats.todaySessions.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Stats.todaySessions.rawValue) }
     }
-    
+
     var lastSessionDate: String {
-        get { defaults.string(forKey: "lastSessionDate") ?? "" }
-        set { defaults.set(newValue, forKey: "lastSessionDate") }
+        get { defaults.string(forKey: SettingsKeys.Stats.lastSessionDate.rawValue) ?? "" }
+        set { defaults.set(newValue, forKey: SettingsKeys.Stats.lastSessionDate.rawValue) }
     }
-    
+
     var weeklyDataJSON: String {
-        get { defaults.string(forKey: "weeklyData") ?? "[]" }
-        set { defaults.set(newValue, forKey: "weeklyData") }
+        get { defaults.string(forKey: SettingsKeys.Stats.weeklyData.rawValue) ?? "[]" }
+        set { defaults.set(newValue, forKey: SettingsKeys.Stats.weeklyData.rawValue) }
     }
-    
+
     var todos: [TodoItem] {
         get {
-            guard let data = defaults.data(forKey: "todos"),
+            guard let data = defaults.data(forKey: SettingsKeys.Session.todos.rawValue),
                   let todos = try? JSONDecoder().decode([TodoItem].self, from: data) else {
                 return []
             }
@@ -159,9 +182,61 @@ final class SettingsStore: ObservableObject {
         }
         set {
             if let data = try? JSONEncoder().encode(newValue) {
-                defaults.set(data, forKey: "todos")
+                defaults.set(data, forKey: SettingsKeys.Session.todos.rawValue)
             }
         }
+    }
+
+    // MARK: Session History
+    var sessionHistory: [SessionRecord] {
+        get {
+            guard let data = defaults.data(forKey: SettingsKeys.Stats.sessionHistory.rawValue),
+                  let records = try? JSONDecoder().decode([SessionRecord].self, from: data) else {
+                return []
+            }
+            return records
+        }
+        set {
+            if let data = try? JSONEncoder().encode(newValue) {
+                defaults.set(data, forKey: SettingsKeys.Stats.sessionHistory.rawValue)
+            }
+        }
+    }
+
+    var bestStreakEver: Int {
+        get { defaults.integer(forKey: SettingsKeys.Stats.bestStreakEver.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Stats.bestStreakEver.rawValue) }
+    }
+
+    // MARK: Achievement Stats
+    var achievements: [Achievement] {
+        get {
+            guard let data = defaults.data(forKey: SettingsKeys.Achievements.achievements.rawValue),
+                  let items = try? JSONDecoder().decode([Achievement].self, from: data) else {
+                return []
+            }
+            return items
+        }
+        set {
+            if let data = try? JSONEncoder().encode(newValue) {
+                defaults.set(data, forKey: SettingsKeys.Achievements.achievements.rawValue)
+            }
+        }
+    }
+
+    var zenSessionCount: Int {
+        get { defaults.integer(forKey: SettingsKeys.Achievements.zenSessionCount.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Achievements.zenSessionCount.rawValue) }
+    }
+
+    var earlyBirdCount: Int {
+        get { defaults.integer(forKey: SettingsKeys.Achievements.earlyBirdCount.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Achievements.earlyBirdCount.rawValue) }
+    }
+
+    var nightOwlCount: Int {
+        get { defaults.integer(forKey: SettingsKeys.Achievements.nightOwlCount.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Achievements.nightOwlCount.rawValue) }
     }
     
     private init() {}
@@ -185,6 +260,13 @@ extension String {
         case "green": return .green
         case "orange": return .orange
         case "purple": return .purple
+        case "pink": return .pink
+        case "teal": return .teal
+        case "indigo": return .indigo
+        case "yellow": return .yellow
+        case "mint": return .mint
+        case "cyan": return .cyan
+        case "brown": return .brown
         default: return .red
         }
     }
@@ -224,19 +306,91 @@ struct SessionType: Identifiable, Codable, Hashable {
     ]
 }
 
+// MARK: - Priority
+
+enum Priority: String, Codable, CaseIterable, Comparable {
+    case low, medium, high
+
+    static func < (lhs: Priority, rhs: Priority) -> Bool {
+        let order: [Priority] = [.low, .medium, .high]
+        return order.firstIndex(of: lhs)! < order.firstIndex(of: rhs)!
+    }
+
+    var color: Color {
+        switch self {
+        case .low: return .gray
+        case .medium: return .orange
+        case .high: return .red
+        }
+    }
+}
+
 // MARK: - Todo Item
 struct TodoItem: Identifiable, Codable, Hashable {
     var id: UUID
     var title: String
     var isCompleted: Bool
     var createdAt: Date
-    
-    init(id: UUID = UUID(), title: String, isCompleted: Bool = false) {
+    var priority: Priority
+    var linkedSessionCount: Int
+    var dueDate: Date?
+
+    init(id: UUID = UUID(), title: String, isCompleted: Bool = false, priority: Priority = .medium, dueDate: Date? = nil) {
         self.id = id
         self.title = title
         self.isCompleted = isCompleted
         self.createdAt = Date()
+        self.priority = priority
+        self.linkedSessionCount = 0
+        self.dueDate = dueDate
     }
+
+    // Migration-safe decoding for existing data without new fields
+    enum CodingKeys: String, CodingKey {
+        case id, title, isCompleted, createdAt, priority, linkedSessionCount, dueDate
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        isCompleted = try container.decode(Bool.self, forKey: .isCompleted)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        priority = try container.decodeIfPresent(Priority.self, forKey: .priority) ?? .medium
+        linkedSessionCount = try container.decodeIfPresent(Int.self, forKey: .linkedSessionCount) ?? 0
+        dueDate = try container.decodeIfPresent(Date.self, forKey: .dueDate)
+    }
+}
+
+// MARK: - Session Record
+struct SessionRecord: Codable, Identifiable {
+    var id: UUID
+    var date: Date
+    var sessionType: String
+    var duration: TimeInterval
+    var completed: Bool
+    var linkedTaskId: UUID?
+
+    init(id: UUID = UUID(), date: Date = Date(), sessionType: String, duration: TimeInterval, completed: Bool, linkedTaskId: UUID? = nil) {
+        self.id = id
+        self.date = date
+        self.sessionType = sessionType
+        self.duration = duration
+        self.completed = completed
+        self.linkedTaskId = linkedTaskId
+    }
+}
+
+// MARK: - Achievement
+struct Achievement: Identifiable, Codable {
+    let id: String
+    let title: String
+    let description: String
+    let icon: String
+    var isUnlocked: Bool
+    var unlockedDate: Date?
+    var progress: Int
+    let goal: Int
 }
 
 // MARK: - Timer State Data
@@ -247,7 +401,7 @@ struct TimerStateData: Codable {
     var completedSessions: Int
     var startTimeInterval: TimeInterval?
     var isRunning: Bool
-    
+
     init(
         mode: String = "focus",
         timeRemaining: TimeInterval = 25 * 60,
@@ -263,490 +417,186 @@ struct TimerStateData: Codable {
     }
 }
 
-// MARK: - Timer Manager
-/// Main controller for the pomodoro timer functionality
-class TimerManager: ObservableObject {
-    
-    // MARK: - Types
-    enum TimerState: String, Codable {
-        case stopped, running, paused
-    }
-    
-    enum TimerMode: String, Codable, CaseIterable {
-        case focus = "Focus"
-        case shortBreak = "Short Break"
-        case longBreak = "Long Break"
-    }
-    
-    struct DailyStat: Codable, Identifiable {
-        var id: String { date }
-        let date: String
-        var sessions: Int
-        var minutes: Double
-        
-        /// Returns day of week abbreviation (e.g., "Mon")
-        var dayOfWeek: String {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd"
-            guard let dateObj = formatter.date(from: date) else { return "" }
-            formatter.dateFormat = "EEE"
-            return formatter.string(from: dateObj)
+// MARK: - App Theme
+
+enum AppTheme: String, CaseIterable, Identifiable {
+    case `default` = "default"
+    case darkNoir = "darkNoir"
+    case pastel = "pastel"
+    case neon = "neon"
+    case nature = "nature"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .default: return "Default"
+        case .darkNoir: return "Dark Noir"
+        case .pastel: return "Pastel"
+        case .neon: return "Neon"
+        case .nature: return "Nature"
         }
     }
-    
-    // MARK: - Published Properties
-    @Published var timeRemaining: TimeInterval
-    @Published var state: TimerState = .stopped
-    @Published var mode: TimerMode = .focus
-    @Published var completedSessions: Int = 0
-    @Published var currentSessionName: String = ""
-    @Published var availableSessions: [SessionType] = SessionType.defaultSessions
-    
-    // MARK: - Private Properties
-    private let settings = SettingsStore.shared
-    private var timer: Timer?
-    private var startTime: Date?
-    
-    // MARK: - Computed Properties
-    private var focusTime: TimeInterval { TimeInterval(settings.focusDuration * 60) }
-    private var shortBreakTime: TimeInterval { TimeInterval(settings.shortBreakDuration * 60) }
-    private var longBreakTime: TimeInterval { TimeInterval(settings.longBreakDuration * 60) }
-    
-    var totalFocusTime: Double { settings.totalFocusTime }
-    var totalSessionsCount: Int { settings.totalSessions }
-    var todaySessionsCount: Int { settings.todaySessions }
-    
-    // MARK: - Initialization
-    init() {
-        let defaults = UserDefaults.standard
-        let focusDurationDefault = defaults.integer(forKey: "focusDuration").nonZeroOrDefault(25)
-        let focusTimeDefault = TimeInterval(focusDurationDefault * 60)
-        
-        // Restore saved timer state if available
-        if let savedState = TimerManager.loadTimerState() {
-            timeRemaining = savedState.timeRemaining
-            mode = TimerMode(rawValue: savedState.mode) ?? .focus
-            completedSessions = savedState.completedSessions
-            
-            // Resume timer if it was running
-            if savedState.isRunning, let startInterval = savedState.startTimeInterval {
-                let expectedElapsed = Date().timeIntervalSince1970 - startInterval
-                let adjustedRemaining = savedState.timeRemaining - expectedElapsed
-                
-                if adjustedRemaining > 0 {
-                    timeRemaining = adjustedRemaining
-                    self.startTime = Date(timeIntervalSince1970: startInterval)
-                    start()
-                } else {
-                    timeRemaining = focusTimeDefault
-                    resetTimerState()
-                }
-            }
-        } else {
-            timeRemaining = focusTimeDefault
-        }
-        
-        ///Sample data for demos
-        // if getWeeklyData().isEmpty && settings.totalSessions == 0 {
-            // seedSampleData()
-        // }
-        
-        checkAndResetDailyCounter()
-        loadWeeklyData()
-    }
-    
-    // MARK: - Public Methods
-    func start() {
-        guard state != .running else { return }
-        
-        startTime = Date()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            
-            if self.timeRemaining > 0 {
-                self.timeRemaining -= 1
-                self.saveTimerState()
-            } else {
-                self.timerCompleted()
-            }
-        }
-        state = .running
-        saveTimerState()
-    }
-    
-    func pause() {
-        timer?.invalidate()
-        state = .paused
-        saveTimerState()
-    }
-    
-    func stop() {
-        timer?.invalidate()
-        startTime = nil
-        state = .stopped
-        resetTimer()
-        resetTimerState()
-    }
-    
-    func skip() {
-        let previousMode = mode
-        switchMode()
-        sendNotification(forCompletedMode: previousMode)
-    }
-    
-    func togglePlayPause() {
-        if state == .running {
-            pause()
-        } else {
-            start()
+
+    var icon: String {
+        switch self {
+        case .default: return "circle.lefthalf.filled"
+        case .darkNoir: return "moon.stars.fill"
+        case .pastel: return "paintpalette.fill"
+        case .neon: return "bolt.fill"
+        case .nature: return "leaf.fill"
         }
     }
-    
-    func updateTimerDuration() {
-        if state == .stopped {
-            resetTimer()
+
+    var forcesDarkMode: Bool {
+        self == .darkNoir || self == .neon
+    }
+
+    var forcesLightMode: Bool {
+        self == .pastel || self == .nature
+    }
+
+    var locksAppearance: Bool {
+        forcesDarkMode || forcesLightMode
+    }
+
+    func colors(accent: Color) -> ThemeColors {
+        switch self {
+        case .default:
+            return ThemeColors(
+                background: Color(.windowBackgroundColor),
+                cardBackground: Color(.windowBackgroundColor),
+                cardShadow: Color.black.opacity(0.05),
+                textPrimary: .primary,
+                textSecondary: .secondary,
+                glowIntensity: 1.0,
+                shadowRadius: 10
+            )
+        case .darkNoir:
+            return ThemeColors(
+                background: Color(red: 0.10, green: 0.10, blue: 0.10),
+                cardBackground: Color(red: 0.14, green: 0.14, blue: 0.14),
+                cardShadow: Color.black.opacity(0.15),
+                textPrimary: Color(white: 0.91),
+                textSecondary: Color(white: 0.53),
+                glowIntensity: 0.7,
+                shadowRadius: 6
+            )
+        case .pastel:
+            return ThemeColors(
+                background: Color(red: 0.96, green: 0.94, blue: 0.92),
+                cardBackground: Color(red: 1.0, green: 0.99, blue: 0.98),
+                cardShadow: Color.black.opacity(0.03),
+                textPrimary: Color(red: 0.29, green: 0.29, blue: 0.29),
+                textSecondary: Color(red: 0.60, green: 0.60, blue: 0.60),
+                glowIntensity: 0.5,
+                shadowRadius: 12
+            )
+        case .neon:
+            return ThemeColors(
+                background: Color(red: 0.07, green: 0.07, blue: 0.09),
+                cardBackground: Color(red: 0.11, green: 0.11, blue: 0.15),
+                cardShadow: accent.opacity(0.2),
+                textPrimary: Color(red: 0.94, green: 0.94, blue: 0.94),
+                textSecondary: Color(red: 0.48, green: 0.48, blue: 0.54),
+                glowIntensity: 1.8,
+                shadowRadius: 15
+            )
+        case .nature:
+            return ThemeColors(
+                background: Color(red: 0.95, green: 0.93, blue: 0.89),
+                cardBackground: Color(red: 0.97, green: 0.96, blue: 0.93),
+                cardShadow: Color(red: 0.55, green: 0.45, blue: 0.33).opacity(0.08),
+                textPrimary: Color(red: 0.24, green: 0.20, blue: 0.15),
+                textSecondary: Color(red: 0.55, green: 0.45, blue: 0.33),
+                glowIntensity: 0.8,
+                shadowRadius: 10
+            )
         }
-        saveTimerState()
-    }
-    
-    func setSession(_ session: SessionType) {
-        currentSessionName = session.name
-        settings.currentSessionName = session.name
-        settings.focusDuration = session.focusDuration
-        settings.shortBreakDuration = session.shortBreakDuration
-        settings.longBreakDuration = session.longBreakDuration
-        
-        if !settings.overrideThemeColor {
-            settings.themeColor = session.colorHex
-        }
-        
-        if state == .stopped {
-            resetTimer()
-        }
-    }
-    
-    func getTodayString() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: Date())
-    }
-    
-    func getWeeklyData() -> [DailyStat] {
-        guard let data = settings.weeklyDataJSON.data(using: .utf8),
-              let decoded = try? JSONDecoder().decode([DailyStat].self, from: data) else {
-            return []
-        }
-        return decoded
-    }
-    
-    func resetAllData() {
-        stop()
-        completedSessions = 0
-        mode = .focus
-        settings.totalFocusTime = 0
-        settings.totalSessions = 0
-        settings.todaySessions = 0
-        settings.lastSessionDate = ""
-        settings.weeklyDataJSON = "[]"
-        resetTimer()
-        startTime = nil
-        resetTimerState()
-        objectWillChange.send()
-    }
-    
-    func seedSampleData() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        let calendar = Calendar.current
-        let today = Date()
-        
-        var sampleWeeklyData: [DailyStat] = []
-        let sampleData: [(daysAgo: Int, sessions: Int, minutes: Double)] = [
-            (6, 4, 120),
-            (5, 6, 180),
-            (4, 3, 90),
-            (3, 5, 150),
-            (2, 7, 210),
-            (1, 4, 120),
-            (0, 2, 60)
-        ]
-        
-        for data in sampleData {
-            if let date = calendar.date(byAdding: .day, value: -data.daysAgo, to: today) {
-                let dateString = dateFormatter.string(from: date)
-                sampleWeeklyData.append(DailyStat(date: dateString, sessions: data.sessions, minutes: data.minutes))
-            }
-        }
-        
-        if let encoded = try? JSONEncoder().encode(sampleWeeklyData),
-           let jsonString = String(data: encoded, encoding: .utf8) {
-            settings.weeklyDataJSON = jsonString
-        }
-        
-        settings.totalFocusTime = 930 * 60
-        settings.totalSessions = 31
-        settings.todaySessions = 2
-        
-        objectWillChange.send()
-    }
-    
-    // MARK: - Private Methods
-    private func timerCompleted() {
-        timer?.invalidate()
-        let completedMode = mode
-        switchMode()
-        sendNotification(forCompletedMode: completedMode)
-    }
-    
-    private func switchMode() {
-        timer?.invalidate()
-        
-        // Track statistics when completing a focus session
-        if mode == .focus {
-            completedSessions += 1
-            settings.totalSessions += 1
-            settings.todaySessions += 1
-            
-            // Record focus time
-            if let startTime = startTime {
-                let elapsedTime = Date().timeIntervalSince(startTime)
-                settings.totalFocusTime += elapsedTime
-                addToWeeklyData(time: elapsedTime)
-            }
-            
-            updateLastSessionDate()
-            
-            // Determine break type (long break every 4 sessions)
-            if completedSessions % 4 == 0 {
-                mode = .longBreak
-                timeRemaining = longBreakTime
-            } else {
-                mode = .shortBreak
-                timeRemaining = shortBreakTime
-            }
-            
-            if settings.autoStartBreaks {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                    self?.start()
-                }
-            }
-        } else {
-            // Switch back to focus
-            mode = .focus
-            timeRemaining = focusTime
-            
-            if settings.autoStartFocus {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                    self?.start()
-                }
-            }
-        }
-        
-        state = .stopped
-        startTime = nil
-        saveTimerState()
-        playNotificationSound()
-    }
-    
-    private func resetTimer() {
-        switch mode {
-        case .focus: timeRemaining = focusTime
-        case .shortBreak: timeRemaining = shortBreakTime
-        case .longBreak: timeRemaining = longBreakTime
-        }
-    }
-    
-    private func checkAndResetDailyCounter() {
-        let today = getTodayString()
-        if settings.lastSessionDate != today {
-            settings.todaySessions = 0
-        }
-    }
-    
-    private func updateLastSessionDate() {
-        settings.lastSessionDate = getTodayString()
-    }
-    
-    private func loadWeeklyData() {
-        guard let data = settings.weeklyDataJSON.data(using: .utf8),
-              let decoded = try? JSONDecoder().decode([DailyStat].self, from: data) else {
-            settings.weeklyDataJSON = "[]"
-            return
-        }
-        
-        let last7Days = getLast7Days()
-        let filtered = decoded.filter { last7Days.contains($0.date) }
-        
-        if let encoded = try? JSONEncoder().encode(filtered),
-           let jsonString = String(data: encoded, encoding: .utf8) {
-            settings.weeklyDataJSON = jsonString
-            objectWillChange.send()
-        }
-    }
-    
-    private func getLast7Days() -> [String] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        
-        return (0..<7).map { offset in
-            let date = Calendar.current.date(byAdding: .day, value: -offset, to: Date())!
-            return formatter.string(from: date)
-        }.reversed()
-    }
-    
-    private func addToWeeklyData(time: TimeInterval) {
-        let today = getTodayString()
-        let minutes = time / 60
-        
-        var weeklyData: [DailyStat] = []
-        
-        if let data = settings.weeklyDataJSON.data(using: .utf8),
-           let decoded = try? JSONDecoder().decode([DailyStat].self, from: data) {
-            weeklyData = decoded
-        }
-        
-        // Update or add today's stats
-        if let index = weeklyData.firstIndex(where: { $0.date == today }) {
-            weeklyData[index].sessions += 1
-            weeklyData[index].minutes += minutes
-        } else {
-            weeklyData.append(DailyStat(date: today, sessions: 1, minutes: minutes))
-        }
-        
-        // Keep only last 7 days
-        let last7Days = getLast7Days()
-        weeklyData = weeklyData.filter { last7Days.contains($0.date) }
-        
-        if let encoded = try? JSONEncoder().encode(weeklyData),
-           let jsonString = String(data: encoded, encoding: .utf8) {
-            settings.weeklyDataJSON = jsonString
-            objectWillChange.send()
-        }
-    }
-    
-    private func playNotificationSound() {
-        guard settings.enableSounds else { return }
-        AudioServicesPlaySystemSound(1036)
-    }
-    
-    private func sendNotification(forCompletedMode: TimerMode) {
-        guard settings.enableNotifications else { return }
-        
-        let content = UNMutableNotificationContent()
-        
-        switch forCompletedMode {
-        case .focus:
-            content.title = "Focus Session Complete! 🎯"
-            content.body = "Great work! Time for a well-deserved break."
-        case .shortBreak:
-            content.title = "Break Complete! ☕️"
-            content.body = "Refreshed and ready? Time for another focus session!"
-        case .longBreak:
-            content.title = "Long Break Complete! 🌟"
-            content.body = "You've earned it! Ready for your next focus session?"
-        }
-        
-        content.sound = UNNotificationSound.default
-        
-        let request = UNNotificationRequest(
-            identifier: UUID().uuidString,
-            content: content,
-            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 0.5, repeats: false)
-        )
-        
-        UNUserNotificationCenter.current().add(request)
-    }
-    
-    // MARK: - State Persistence
-    private func saveTimerState() {
-        let stateData = TimerStateData(
-            mode: mode.rawValue,
-            timeRemaining: timeRemaining,
-            completedSessions: completedSessions,
-            startTimeInterval: startTime?.timeIntervalSince1970,
-            isRunning: state == .running
-        )
-        
-        if let data = try? JSONEncoder().encode(stateData) {
-            UserDefaults.standard.set(data, forKey: "savedTimerState")
-        }
-    }
-    
-    private static func loadTimerState() -> TimerStateData? {
-        guard let data = UserDefaults.standard.data(forKey: "savedTimerState"),
-              let stateData = try? JSONDecoder().decode(TimerStateData.self, from: data) else {
-            return nil
-        }
-        return stateData
-    }
-    
-    private func resetTimerState() {
-        UserDefaults.standard.removeObject(forKey: "savedTimerState")
     }
 }
 
-// MARK: - Zen Music Player
-final class ZenMusicPlayer: ObservableObject {
-    static let shared = ZenMusicPlayer()
-    
-    @Published var isPlaying: Bool = false
-    @Published var isLoading: Bool = false
-    
-    private var player: AVPlayer?
-    private var playerItem: AVPlayerItem?
-    private var settings: SettingsStore { SettingsStore.shared }
-    
-    private init() {}
-    
-    func toggle() {
-        if isPlaying {
-            stop()
-        } else {
-            play()
+// MARK: - App Appearance
+
+enum AppAppearance: String, CaseIterable {
+    case system, light, dark
+
+    var displayName: String {
+        switch self {
+        case .system: return "System"
+        case .light: return "Light"
+        case .dark: return "Dark"
         }
     }
-    
-    func play() {
-        guard !isPlaying else { return }
-        
-        isLoading = true
-        
-        guard let url = Bundle.main.url(forResource: "inner_peace", withExtension: "mp3") else {
-            print("Failed to find inner_peace.mp3 in bundle")
-            isLoading = false
-            return
+}
+
+// MARK: - Theme Colors
+
+struct ThemeColors {
+    let background: Color
+    let cardBackground: Color
+    let cardShadow: Color
+    let textPrimary: Color
+    let textSecondary: Color
+    let glowIntensity: CGFloat
+    let shadowRadius: CGFloat
+
+    static let `default` = AppTheme.default.colors(accent: .red)
+}
+
+// MARK: - Theme Manager
+
+enum ThemeManager {
+    static func colors(for themeRawValue: String, accent: Color) -> ThemeColors {
+        let theme = AppTheme(rawValue: themeRawValue) ?? .default
+        return theme.colors(accent: accent)
+    }
+}
+
+// MARK: - Animation Style
+
+enum AnimationStyle: String, CaseIterable {
+    case smooth, snappy, gentle
+
+    var displayName: String {
+        switch self {
+        case .smooth: return "Smooth"
+        case .snappy: return "Snappy"
+        case .gentle: return "Gentle"
         }
-        
-        playerItem = AVPlayerItem(url: url)
-        player = AVPlayer(playerItem: playerItem)
-        player?.volume = 0.5
-        
-        NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
-            object: playerItem,
-            queue: .main
-        ) { [weak self] _ in
-            self?.player?.seek(to: .zero)
-            self?.player?.play()
+    }
+}
+
+// MARK: - Animation Provider
+
+enum AnimationProvider {
+    /// Standard interaction spring (button taps, selections, toggles)
+    static func spring(for styleRaw: String) -> Animation {
+        let style = AnimationStyle(rawValue: styleRaw) ?? .smooth
+        switch style {
+        case .smooth: return .spring(response: 0.5, dampingFraction: 0.7)
+        case .snappy: return .spring(response: 0.25, dampingFraction: 0.8)
+        case .gentle: return .spring(response: 0.8, dampingFraction: 0.6)
         }
-        
-        player?.play()
-        isPlaying = true
-        isLoading = false
     }
-    
-    func stop() {
-        player?.pause()
-        player = nil
-        playerItem = nil
-        isPlaying = false
-        isLoading = false
+
+    /// Quick feedback (button press, scale bounce)
+    static func springFast(for styleRaw: String) -> Animation {
+        let style = AnimationStyle(rawValue: styleRaw) ?? .smooth
+        switch style {
+        case .smooth: return .spring(response: 0.3, dampingFraction: 0.7)
+        case .snappy: return .spring(response: 0.15, dampingFraction: 0.85)
+        case .gentle: return .spring(response: 0.5, dampingFraction: 0.65)
+        }
     }
-    
-    func getCurrentStationName() -> String {
-        return "Inner Peace"
+
+    /// Larger transitions (card entrance, mode change, page transitions)
+    static func springSlow(for styleRaw: String) -> Animation {
+        let style = AnimationStyle(rawValue: styleRaw) ?? .smooth
+        switch style {
+        case .smooth: return .spring(response: 0.6, dampingFraction: 0.8)
+        case .snappy: return .spring(response: 0.35, dampingFraction: 0.85)
+        case .gentle: return .spring(response: 1.0, dampingFraction: 0.65)
+        }
     }
-    
-    func nextStation() {}
 }

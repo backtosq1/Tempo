@@ -4,42 +4,52 @@ struct SettingsView: View {
     @ObservedObject var timerManager: TimerManager
     @ObservedObject private var updateManager = UpdateManager.shared
     var onResetSettings: (() -> Void)?
-    
-    @AppStorage("focusDuration") private var focusDuration = 25
-    @AppStorage("shortBreakDuration") private var shortBreakDuration = 5
-    @AppStorage("longBreakDuration") private var longBreakDuration = 15
-    
-    @AppStorage("autoStartBreaks") private var autoStartBreaks = true
-    @AppStorage("autoStartFocus") private var autoStartFocus = false
-    @AppStorage("enableNotifications") private var enableNotifications = true
-    @AppStorage("enableSounds") private var enableSounds = true
-    @AppStorage("enableZenMusic") private var enableZenMusic = false
-    
-    @AppStorage("themeColor") private var themeColor = "red"
-    @AppStorage("overrideThemeColor") private var overrideThemeColor = false
-    
+
+    @AppStorage(SettingsKeys.Timer.focusDuration.rawValue) private var focusDuration = 25
+    @AppStorage(SettingsKeys.Timer.shortBreakDuration.rawValue) private var shortBreakDuration = 5
+    @AppStorage(SettingsKeys.Timer.longBreakDuration.rawValue) private var longBreakDuration = 15
+
+    @AppStorage(SettingsKeys.Timer.autoStartBreaks.rawValue) private var autoStartBreaks = true
+    @AppStorage(SettingsKeys.Timer.autoStartFocus.rawValue) private var autoStartFocus = false
+    @AppStorage(SettingsKeys.Behavior.enableNotifications.rawValue) private var enableNotifications = true
+    @AppStorage(SettingsKeys.Behavior.enableSounds.rawValue) private var enableSounds = true
+    @AppStorage(SettingsKeys.Behavior.enableZenMusic.rawValue) private var enableZenMusic = false
+
+    @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColor = "red"
+    @AppStorage(SettingsKeys.Appearance.overrideThemeColor.rawValue) private var overrideThemeColor = false
+    @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme = "default"
+    @AppStorage(SettingsKeys.Appearance.appAppearance.rawValue) private var appAppearance = "system"
+    @AppStorage(SettingsKeys.Appearance.animationStyle.rawValue) private var animationStyle = "smooth"
+
     @State private var showingResetConfirmation = false
     @State private var showingUpdateAlert = false
-    
-    private var accentColor: Color {
-        switch themeColor {
-        case "red": return .red
-        case "blue": return .blue
-        case "green": return .green
-        case "orange": return .orange
-        case "purple": return .purple
-        default: return .red
-        }
+    @State private var expandedSessionId: UUID? = nil
+    @State private var showingDeleteConfirmation = false
+    @State private var sessionToDelete: UUID? = nil
+    @State private var editableSessions: [SessionType] = []
+
+    private var accentColor: Color { themeColor.themeColor }
+    private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
+
+    private var currentTheme: AppTheme {
+        AppTheme(rawValue: appTheme) ?? .default
     }
-    
-    let themeColors = [
-        ("red", "Red", Color.red),
-        ("blue", "Blue", Color.blue),
-        ("green", "Green", Color.green),
-        ("orange", "Orange", Color.orange),
-        ("purple", "Purple", Color.purple),
+
+    let accentColors: [(id: String, name: String, color: Color)] = [
+        ("red", "Red", .red),
+        ("blue", "Blue", .blue),
+        ("green", "Green", .green),
+        ("orange", "Orange", .orange),
+        ("purple", "Purple", .purple),
+        ("pink", "Pink", .pink),
+        ("teal", "Teal", .teal),
+        ("indigo", "Indigo", .indigo),
+        ("yellow", "Yellow", .yellow),
+        ("mint", "Mint", .mint),
+        ("cyan", "Cyan", .cyan),
+        ("brown", "Brown", .brown),
     ]
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 30) {
@@ -48,14 +58,15 @@ struct SettingsView: View {
                     Text("Settings")
                         .font(.largeTitle)
                         .fontWeight(.bold)
+                        .foregroundColor(theme.textPrimary)
                     Text("Customize Tempo")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(theme.textSecondary)
                 }
                 .padding(.top, 20)
-                
+
                 // Timer Settings
-                SettingsSection(title: "Timer Settings", icon: "timer", accentColor: accentColor) {
+                SettingsSection(title: "Timer Settings", icon: "timer", accentColor: accentColor, themeColors: theme) {
                     DurationSlider(
                         value: $focusDuration,
                         label: "Focus Duration",
@@ -64,7 +75,7 @@ struct SettingsView: View {
                         suffix: "min",
                         accentColor: accentColor
                     )
-                    
+
                     DurationSlider(
                         value: $shortBreakDuration,
                         label: "Short Break",
@@ -73,7 +84,7 @@ struct SettingsView: View {
                         suffix: "min",
                         accentColor: accentColor
                     )
-                    
+
                     DurationSlider(
                         value: $longBreakDuration,
                         label: "Long Break",
@@ -83,16 +94,65 @@ struct SettingsView: View {
                         accentColor: accentColor
                     )
                 }
-                
+
+                // Session Presets
+                SettingsSection(title: "Session Presets", icon: "list.bullet", accentColor: accentColor, themeColors: theme) {
+                    ForEach($editableSessions) { $session in
+                        SessionPresetRow(
+                            session: $session,
+                            isExpanded: expandedSessionId == session.id,
+                            isDefault: SessionType.defaultSessions.contains(where: { $0.name == session.name }),
+                            accentColor: accentColor,
+                            themeColors: theme,
+                            onToggleExpand: {
+                                withAnimation(.spring(response: 0.3)) {
+                                    expandedSessionId = expandedSessionId == session.id ? nil : session.id
+                                }
+                            },
+                            onDelete: {
+                                sessionToDelete = session.id
+                                showingDeleteConfirmation = true
+                            }
+                        )
+                    }
+
+                    Button(action: {
+                        let newSession = SessionType(
+                            name: "Custom",
+                            focusDuration: 25,
+                            shortBreakDuration: 5,
+                            longBreakDuration: 15,
+                            colorHex: "orange"
+                        )
+                        editableSessions.append(newSession)
+                        withAnimation(.spring(response: 0.3)) {
+                            expandedSessionId = newSession.id
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(accentColor)
+                            Text("Add Session")
+                                .foregroundColor(accentColor)
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                .onChange(of: editableSessions) {
+                    timerManager.updateSessions(editableSessions)
+                }
+
                 // Behavior
-                SettingsSection(title: "Behavior", icon: "arrow.triangle.2.circlepath", accentColor: accentColor) {
+                SettingsSection(title: "Behavior", icon: "arrow.triangle.2.circlepath", accentColor: accentColor, themeColors: theme) {
                     ToggleRow(
                         icon: "play.circle.fill",
                         label: "Auto-start breaks",
                         isOn: $autoStartBreaks,
                         accentColor: accentColor
                     )
-                    
+
                     ToggleRow(
                         icon: "pause.circle.fill",
                         label: "Auto-start focus sessions",
@@ -100,23 +160,23 @@ struct SettingsView: View {
                         accentColor: accentColor
                     )
                 }
-                
+
                 // Notifications & Sounds
-                SettingsSection(title: "Notifications & Sounds", icon: "bell.badge.fill", accentColor: accentColor) {
+                SettingsSection(title: "Notifications & Sounds", icon: "bell.badge.fill", accentColor: accentColor, themeColors: theme) {
                     ToggleRow(
                         icon: "bell.fill",
                         label: "Enable notifications",
                         isOn: $enableNotifications,
                         accentColor: accentColor
                     )
-                    
+
                     ToggleRow(
                         icon: "speaker.wave.2.fill",
                         label: "Enable sounds",
                         isOn: $enableSounds,
                         accentColor: accentColor
                     )
-                    
+
                     ToggleRow(
                         icon: "music.note",
                         label: "Enable zen music during focus",
@@ -124,29 +184,81 @@ struct SettingsView: View {
                         accentColor: accentColor
                     )
                 }
-                
+
+                // Theme
+                SettingsSection(title: "Theme", icon: "sparkles", accentColor: accentColor, themeColors: theme) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack(spacing: 12) {
+                            ForEach(AppTheme.allCases) { t in
+                                ThemePreviewButton(
+                                    theme: t,
+                                    accent: accentColor,
+                                    isSelected: appTheme == t.rawValue
+                                ) {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        appTheme = t.rawValue
+                                    }
+                                }
+                            }
+                        }
+
+                        if currentTheme.locksAppearance {
+                            HStack(spacing: 6) {
+                                Image(systemName: currentTheme.forcesDarkMode ? "moon.fill" : "sun.max.fill")
+                                    .font(.caption2)
+                                Text("This theme uses \(currentTheme.forcesDarkMode ? "dark" : "light") mode")
+                                    .font(.caption)
+                            }
+                            .foregroundColor(theme.textSecondary)
+                        }
+                    }
+                }
+
                 // Appearance
-                SettingsSection(title: "Appearance", icon: "paintbrush.fill", accentColor: accentColor) {
+                SettingsSection(title: "Appearance", icon: "paintbrush.fill", accentColor: accentColor, themeColors: theme) {
+                    // Appearance mode picker
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Appearance Mode")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(theme.textSecondary)
+
+                        Picker("Appearance", selection: $appAppearance) {
+                            ForEach(AppAppearance.allCases, id: \.rawValue) { mode in
+                                Text(mode.displayName).tag(mode.rawValue)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .disabled(currentTheme.locksAppearance)
+                    }
+
+                    // Animation style picker
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Animation Style")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(theme.textSecondary)
+
+                        Picker("Animation", selection: $animationStyle) {
+                            ForEach(AnimationStyle.allCases, id: \.rawValue) { style in
+                                Text(style.displayName).tag(style.rawValue)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+
                     ToggleRow(
                         icon: "lock.fill",
                         label: "Keep theme color when switching sessions",
                         isOn: $overrideThemeColor,
                         accentColor: accentColor
                     )
-                    
+
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Theme Color")
+                        Text("Accent Color")
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.secondary)
-                        
-                        LazyVGrid(columns: [
-                            GridItem(.flexible()),
-                            GridItem(.flexible()),
-                            GridItem(.flexible()),
-                            GridItem(.flexible()),
-                            GridItem(.flexible())
-                        ], spacing: 15) {
-                            ForEach(themeColors, id: \.0) { id, name, color in
+                            .foregroundColor(theme.textSecondary)
+
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 15) {
+                            ForEach(accentColors, id: \.id) { id, name, color in
                                 ThemeColorButton(
                                     color: color,
                                     name: name,
@@ -162,9 +274,9 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 8)
                 }
-                
+
                 // Reset & About
-                SettingsSection(title: "About", icon: "info.circle.fill", accentColor: accentColor) {
+                SettingsSection(title: "About", icon: "info.circle.fill", accentColor: accentColor, themeColors: theme) {
                     VStack(spacing: 16) {
                         Button(action: {
                             updateManager.checkForUpdates()
@@ -187,7 +299,7 @@ struct SettingsView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                         .disabled(updateManager.isChecking)
-                        
+
                         Button(action: {
                             showingResetConfirmation = true
                         }) {
@@ -204,23 +316,27 @@ struct SettingsView: View {
                             .cornerRadius(10)
                         }
                         .buttonStyle(PlainButtonStyle())
-                        
+
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Tempo v\(updateManager.currentVersion)")
                                 .font(.caption)
                                 .fontWeight(.medium)
+                                .foregroundColor(theme.textSecondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.vertical, 8)
                     }
                 }
-                
+
                 Spacer()
                     .frame(height: 40)
             }
             .padding(.horizontal)
         }
-        .background(Color(.windowBackgroundColor))
+        .background(theme.background)
+        .onAppear {
+            editableSessions = timerManager.availableSessions
+        }
         .onChange(of: updateManager.isChecking) { _, newValue in
             if !newValue {
                 showingUpdateAlert = true
@@ -254,10 +370,21 @@ struct SettingsView: View {
                 Text("You are using the latest version.")
             }
         }
-    }
-    
-    private func resetAllData() {
-            timerManager.resetAllData()
-            onResetSettings?()
+        .confirmationDialog("Delete Session?", isPresented: $showingDeleteConfirmation, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                if let id = sessionToDelete {
+                    editableSessions.removeAll { $0.id == id }
+                    sessionToDelete = nil
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                sessionToDelete = nil
+            }
         }
+    }
+
+    private func resetAllData() {
+        timerManager.resetAllData()
+        onResetSettings?()
+    }
 }

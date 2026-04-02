@@ -2,33 +2,41 @@
 //  Navigation sidebar with app branding and menu items
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SidebarView: View {
     @Binding var selectedTab: Int
+    @EnvironmentObject var timerManager: TimerManager
     @Namespace private var namespace
     @ObservedObject private var updateManager = UpdateManager.shared
     
     // @AppStorage for reactive theme color updates
-    @AppStorage("themeColor") private var themeColorValue: String = "red"
+    @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColorValue: String = "red"
+    @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme: String = "default"
     
     @State private var todos: [TodoItem] = []
     @State private var newTodoTitle: String = ""
     @State private var isAddingTodo: Bool = false
     @State private var editingTodoId: UUID? = nil
     @State private var editingText: String = ""
-    
-    // MARK: - Computed Properties
-    // Convert string theme color to SwiftUI Color
-    private var accentColor: Color {
-        switch themeColorValue {
-        case "red": return .red
-        case "blue": return .blue
-        case "green": return .green
-        case "orange": return .orange
-        case "purple": return .purple
-        default: return .red
-        }
+    @State private var newTodoPriority: Priority = .medium
+    @State private var newTodoDueDate: Date? = nil
+    @State private var showDatePicker: Bool = false
+
+    @State private var draggingTodo: TodoItem? = nil
+    @State private var showCompleted: Bool = false
+
+    private var incompleteTodos: [TodoItem] {
+        todos.filter { !$0.isCompleted }
     }
+
+    private var completedTodos: [TodoItem] {
+        todos.filter { $0.isCompleted }
+    }
+
+    private var accentColor: Color { themeColorValue.themeColor }
+    private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
+    private var currentTheme: AppTheme { AppTheme(rawValue: appTheme) ?? .default }
     
     private var settings: SettingsStore {
         SettingsStore.shared
@@ -56,8 +64,14 @@ struct SidebarView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
-                .ignoresSafeArea()
+            Group {
+                if currentTheme == .default {
+                    VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
+                        .ignoresSafeArea()
+                } else {
+                    theme.background.ignoresSafeArea()
+                }
+            }
         )
         .onAppear {
             loadTodos()
@@ -70,26 +84,50 @@ struct SidebarView: View {
     
     private func saveTodos() {
         settings.todos = todos
+        timerManager.reloadTodos()
     }
     
     private func addTodo() {
         guard !newTodoTitle.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        let todo = TodoItem(title: newTodoTitle.trimmingCharacters(in: .whitespaces))
-        todos.insert(todo, at: 0)
+        let todo = TodoItem(title: newTodoTitle.trimmingCharacters(in: .whitespaces), priority: newTodoPriority, dueDate: newTodoDueDate)
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.65)) {
+            todos.insert(todo, at: 0)
+        }
         saveTodos()
         newTodoTitle = ""
-        isAddingTodo = false
+        newTodoPriority = .medium
+        newTodoDueDate = nil
+        showDatePicker = false
+
+        // Delay dismissing the add field slightly for better visual flow
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                isAddingTodo = false
+            }
+        }
     }
     
     private func toggleTodo(_ todo: TodoItem) {
         if let index = todos.firstIndex(where: { $0.id == todo.id }) {
-            todos[index].isCompleted.toggle()
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.68)) {
+                todos[index].isCompleted.toggle()
+            }
+            if todos[index].isCompleted && timerManager.activeTaskId == todo.id {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                    timerManager.setActiveTask(nil)
+                }
+            }
             saveTodos()
         }
     }
     
     private func deleteTodo(_ todo: TodoItem) {
-        todos.removeAll { $0.id == todo.id }
+        if timerManager.activeTaskId == todo.id {
+            timerManager.setActiveTask(nil)
+        }
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            todos.removeAll { $0.id == todo.id }
+        }
         saveTodos()
     }
     
@@ -115,6 +153,31 @@ struct SidebarView: View {
         editingTodoId = nil
         editingText = ""
     }
+
+    private func clearCompleted() {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            todos.removeAll { $0.isCompleted }
+        }
+        saveTodos()
+    }
+
+    private func changePriority(_ todo: TodoItem, to priority: Priority) {
+        if let index = todos.firstIndex(where: { $0.id == todo.id }) {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                todos[index].priority = priority
+            }
+            saveTodos()
+        }
+    }
+
+    private func changeDueDate(_ todo: TodoItem, to date: Date?) {
+        if let index = todos.firstIndex(where: { $0.id == todo.id }) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                todos[index].dueDate = date
+            }
+            saveTodos()
+        }
+    }
     
     // MARK: - View Components
     private var appHeader: some View {
@@ -125,7 +188,8 @@ struct SidebarView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(accentColor.gradient)
                         .frame(width: 32, height: 32)
-                    
+                        .shadow(color: accentColor.opacity(0.4 * theme.glowIntensity), radius: 4 * theme.glowIntensity)
+
                     Image(systemName: "timer")
                         .font(.system(size: 16, weight: .bold))
                         .foregroundColor(.white)
@@ -133,6 +197,7 @@ struct SidebarView: View {
                 
                 Text("Tempo")
                     .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(theme.textPrimary)
                 
                 Spacer()
             }
@@ -149,34 +214,38 @@ struct SidebarView: View {
                 icon: "timer",
                 isSelected: selectedTab == 0,
                 accentColor: accentColor,
-                namespace: namespace
+                namespace: namespace,
+                themeColors: theme
             )
             .onTapGesture { selectTab(0) }
-            
+
             SidebarItem(
                 title: "Statistics",
                 icon: "chart.bar.fill",
                 isSelected: selectedTab == 1,
                 accentColor: accentColor,
-                namespace: namespace
+                namespace: namespace,
+                themeColors: theme
             )
             .onTapGesture { selectTab(1) }
-            
+
             SidebarItem(
                 title: "Settings",
                 icon: "gearshape.fill",
                 isSelected: selectedTab == 2,
                 accentColor: accentColor,
-                namespace: namespace
+                namespace: namespace,
+                themeColors: theme
             )
             .onTapGesture { selectTab(2) }
-            
+
             SidebarItem(
                 title: "Help & About",
                 icon: "questionmark.circle.fill",
                 isSelected: selectedTab == 3,
                 accentColor: accentColor,
-                namespace: namespace
+                namespace: namespace,
+                themeColors: theme
             )
             .onTapGesture { selectTab(3) }
         }
@@ -186,77 +255,288 @@ struct SidebarView: View {
     
     private var todoSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Section header
+            // Section header with count
             HStack {
                 Text("Tasks")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(theme.textSecondary)
                     .textCase(.uppercase)
-                
+
+                if !incompleteTodos.isEmpty {
+                    Text("\(incompleteTodos.count)")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(width: 18, height: 18)
+                        .background(accentColor)
+                        .clipShape(Circle())
+                        .shadow(color: accentColor.opacity(0.4), radius: 4)
+                        .scaleEffect(1.0)
+                        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: incompleteTodos.count)
+                        .transition(.scale.combined(with: .opacity))
+                }
+
                 Spacer()
-                
-                Button(action: { isAddingTodo.toggle() }) {
-                    Image(systemName: "plus.circle")
+
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        isAddingTodo.toggle()
+                    }
+                }) {
+                    Image(systemName: isAddingTodo ? "xmark.circle" : "plus.circle")
                         .font(.system(size: 12))
-                        .foregroundColor(accentColor)
+                        .foregroundColor(isAddingTodo ? .secondary : accentColor)
+                        .shadow(color: accentColor.opacity(0.3 * theme.glowIntensity), radius: 3 * theme.glowIntensity)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)
-            
+
             // Add todo field
             if isAddingTodo {
-                HStack(spacing: 6) {
-                    TextField("Add task...", text: $newTodoTitle)
-                        .textFieldStyle(PlainTextFieldStyle())
-                        .font(.system(size: 12))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 6)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(4)
-                        .onSubmit { addTodo() }
-                    
-                    Button(action: addTodo) {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding(6)
-                            .background(accentColor)
-                            .clipShape(Circle())
+                VStack(spacing: 8) {
+                    // Priority picker with labels + due date toggle
+                    HStack(spacing: 6) {
+                        ForEach(Priority.allCases, id: \.self) { priority in
+                            Button(action: { newTodoPriority = priority }) {
+                                HStack(spacing: 3) {
+                                    Circle()
+                                        .fill(priority.color)
+                                        .frame(width: 6, height: 6)
+                                    Text(priority == .medium ? "Med" : priority.rawValue.capitalized)
+                                        .font(.system(size: 10, weight: newTodoPriority == priority ? .semibold : .regular))
+                                        .fixedSize()
+                                }
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 4)
+                                .background(
+                                    Capsule()
+                                        .fill(newTodoPriority == priority ? priority.color.opacity(0.15) : Color.clear)
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(newTodoPriority == priority ? priority.color.opacity(0.4) : Color.clear, lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+
+                        Spacer()
+
+                        // Due date toggle
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                showDatePicker.toggle()
+                                if showDatePicker && newTodoDueDate == nil {
+                                    newTodoDueDate = Date()
+                                }
+                                if !showDatePicker {
+                                    newTodoDueDate = nil
+                                }
+                            }
+                        }) {
+                            Image(systemName: newTodoDueDate != nil ? "calendar.badge.checkmark" : "calendar")
+                                .font(.system(size: 11))
+                                .foregroundColor(newTodoDueDate != nil ? accentColor : .secondary)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .buttonStyle(PlainButtonStyle())
+
+                    // Date picker row
+                    if showDatePicker {
+                        HStack(spacing: 6) {
+                            Image(systemName: "calendar")
+                                .font(.system(size: 10))
+                                .foregroundColor(accentColor)
+                            DatePicker("", selection: Binding(
+                                get: { newTodoDueDate ?? Date() },
+                                set: { newTodoDueDate = $0 }
+                            ), displayedComponents: .date)
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .font(.system(size: 11))
+
+                            Spacer()
+
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    newTodoDueDate = nil
+                                    showDatePicker = false
+                                }
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+
+                    HStack(spacing: 6) {
+                        TextField("Add task...", text: $newTodoTitle)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .font(.system(size: 12))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(6)
+                            .onSubmit { addTodo() }
+                            .onExitCommand {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    isAddingTodo = false
+                                    newTodoTitle = ""
+                                    newTodoPriority = .medium
+                                    newTodoDueDate = nil
+                                    showDatePicker = false
+                                }
+                            }
+
+                        Button(action: addTodo) {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(newTodoTitle.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : accentColor)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .disabled(newTodoTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
                 }
                 .padding(.horizontal, 12)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
-            
+
             // Todo list
             ScrollView {
                 VStack(spacing: 4) {
-                    ForEach(todos.prefix(5)) { todo in
+                    if incompleteTodos.isEmpty && completedTodos.isEmpty {
+                        // Empty state
+                        VStack(spacing: 8) {
+                            Image(systemName: "checklist")
+                                .font(.system(size: 20))
+                                .foregroundColor(theme.textSecondary.opacity(0.5))
+                            Text("No tasks yet")
+                                .font(.system(size: 12))
+                                .foregroundColor(theme.textSecondary.opacity(0.6))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                    }
+
+                    ForEach(incompleteTodos) { todo in
                         TodoRow(
                             todo: todo,
                             accentColor: accentColor,
+                            themeColors: theme,
                             isEditing: editingTodoId == todo.id,
+                            isActive: timerManager.activeTaskId == todo.id,
                             editingText: editingText,
                             onToggle: { toggleTodo(todo) },
                             onDelete: { deleteTodo(todo) },
                             onEdit: { startEditing(todo) },
                             onSaveEdit: { saveEdit() },
                             onCancelEdit: { cancelEdit() },
-                            onEditingTextChange: { editingText = $0 }
+                            onEditingTextChange: { editingText = $0 },
+                            onTapActive: {
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                                    if timerManager.activeTaskId == todo.id {
+                                        timerManager.setActiveTask(nil)
+                                    } else {
+                                        timerManager.setActiveTask(todo.id)
+                                    }
+                                }
+                            },
+                            onChangePriority: { changePriority(todo, to: $0) },
+                            onChangeDueDate: { changeDueDate(todo, to: $0) }
                         )
+                        .transition(.asymmetric(
+                            insertion: .scale(scale: 0.8, anchor: .top).combined(with: .opacity),
+                            removal: .asymmetric(
+                                insertion: .identity,
+                                removal: .move(edge: .leading).combined(with: .opacity).combined(with: .scale(scale: 0.9))
+                            )
+                        ))
+                        .opacity(draggingTodo?.id == todo.id ? 0.4 : 1)
+                        .scaleEffect(draggingTodo?.id == todo.id ? 0.95 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.75), value: draggingTodo?.id == todo.id)
+                        .onDrag {
+                            withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                                draggingTodo = todo
+                            }
+                            return NSItemProvider(object: todo.id.uuidString as NSString)
+                        }
+                        .onDrop(of: [.text], delegate: TodoDropDelegate(
+                            item: todo,
+                            todos: $todos,
+                            draggingTodo: $draggingTodo,
+                            onReorder: { saveTodos() }
+                        ))
+                    }
+
+                    if !completedTodos.isEmpty {
+                        // Collapsible completed header
+                        HStack {
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    showCompleted.toggle()
+                                }
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: showCompleted ? "chevron.down" : "chevron.right")
+                                        .font(.system(size: 9, weight: .semibold))
+                                    Text("Completed")
+                                        .font(.system(size: 11, weight: .medium))
+                                    Text("\(completedTodos.count)")
+                                        .font(.system(size: 10, weight: .medium))
+                                        .foregroundColor(theme.textSecondary)
+                                }
+                                .foregroundColor(theme.textSecondary)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+
+                            Spacer()
+
+                            if showCompleted {
+                                Button(action: clearCompleted) {
+                                    Text("Clear")
+                                        .font(.system(size: 10, weight: .medium))
+                                        .foregroundColor(.secondary)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .transition(.opacity)
+                            }
+                        }
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 4)
+
+                        if showCompleted {
+                            ForEach(completedTodos) { todo in
+                                TodoRow(
+                                    todo: todo,
+                                    accentColor: accentColor,
+                                    themeColors: theme,
+                                    isEditing: editingTodoId == todo.id,
+                                    isActive: false,
+                                    editingText: editingText,
+                                    onToggle: { toggleTodo(todo) },
+                                    onDelete: { deleteTodo(todo) },
+                                    onEdit: { startEditing(todo) },
+                                    onSaveEdit: { saveEdit() },
+                                    onCancelEdit: { cancelEdit() },
+                                    onEditingTextChange: { editingText = $0 },
+                                    onTapActive: {},
+                                    onChangePriority: { changePriority(todo, to: $0) },
+                                    onChangeDueDate: { changeDueDate(todo, to: $0) }
+                                )
+                                .transition(.asymmetric(
+                                    insertion: .opacity,
+                                    removal: .move(edge: .leading).combined(with: .opacity)
+                                ))
+                            }
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                        }
                     }
                 }
                 .padding(.horizontal, 12)
-            }
-            .frame(maxHeight: 150)
-            
-            if todos.count > 5 {
-                Text("+\(todos.count - 5) more")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 16)
             }
         }
     }
@@ -271,14 +551,14 @@ struct SidebarView: View {
                 Text("Mini Player")
                     .font(.system(size: 12, weight: .medium))
                 Spacer()
-                Text("⌘M")
+                Text("\u{2318}M")
                     .font(.system(size: 9, weight: .medium, design: .monospaced))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(theme.textSecondary)
             }
-            .foregroundColor(.secondary)
+            .foregroundColor(theme.textSecondary)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(Color.gray.opacity(0.08))
+            .background(theme.cardBackground.opacity(0.5))
             .cornerRadius(6)
         }
         .buttonStyle(PlainButtonStyle())
@@ -292,11 +572,11 @@ struct SidebarView: View {
             Circle()
                 .fill(accentColor)
                 .frame(width: 6, height: 6)
-                .shadow(color: accentColor.opacity(0.5), radius: 2)
+                .shadow(color: accentColor.opacity(0.5 * theme.glowIntensity), radius: 2 * theme.glowIntensity)
             
             Text("v\(updateManager.currentVersion)")
                 .font(.system(size: 10, weight: .medium))
-                .foregroundColor(.secondary)
+                .foregroundColor(theme.textSecondary)
             
             Spacer()
         }
@@ -316,7 +596,9 @@ struct SidebarView: View {
 struct TodoRow: View {
     let todo: TodoItem
     let accentColor: Color
+    var themeColors: ThemeColors = .default
     let isEditing: Bool
+    let isActive: Bool
     let editingText: String
     let onToggle: () -> Void
     let onDelete: () -> Void
@@ -324,70 +606,230 @@ struct TodoRow: View {
     let onSaveEdit: () -> Void
     let onCancelEdit: () -> Void
     let onEditingTextChange: (String) -> Void
-    
+    let onTapActive: () -> Void
+    let onChangePriority: (Priority) -> Void
+    let onChangeDueDate: (Date?) -> Void
+
+    @State private var isHovered = false
+    @State private var showDueDatePicker = false
+    @State private var pulseAnimation = false
+
+    private var dueDateColor: Color {
+        guard let due = todo.dueDate else { return .secondary }
+        let calendar = Calendar.current
+        if calendar.isDateInToday(due) { return .orange }
+        if due < Date() { return .red }
+        return .secondary
+    }
+
+    private static let shortDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        return f
+    }()
+
     var body: some View {
-        HStack(spacing: 8) {
-            Button(action: onToggle) {
-                Image(systemName: todo.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 14))
-                    .foregroundColor(todo.isCompleted ? accentColor : .gray)
-            }
-            .buttonStyle(PlainButtonStyle())
-            
-            if isEditing {
-                TextField("Edit task...", text: Binding(
-                    get: { editingText },
-                    set: { onEditingTextChange($0) }
-                ))
-                .textFieldStyle(PlainTextFieldStyle())
-                .font(.system(size: 12))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(4)
-                .onSubmit { onSaveEdit() }
-                
-                Button(action: onSaveEdit) {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(4)
-                        .background(accentColor)
-                        .clipShape(Circle())
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                // Active indicator bar with pulse
+                if isActive && !todo.isCompleted {
+                    RoundedRectangle(cornerRadius: 1.5)
+                        .fill(accentColor)
+                        .frame(width: 3)
+                        .shadow(color: accentColor.opacity(pulseAnimation ? 0.6 : 0.3), radius: pulseAnimation ? 6 : 3)
+                        .transition(.scale(scale: 0, anchor: .leading).combined(with: .opacity))
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                                pulseAnimation = true
+                            }
+                        }
                 }
-                .buttonStyle(PlainButtonStyle())
-                
-                Button(action: onCancelEdit) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(PlainButtonStyle())
-            } else {
-                Text(todo.title)
-                    .font(.system(size: 12))
-                    .foregroundColor(todo.isCompleted ? .secondary : .primary)
-                    .strikethrough(todo.isCompleted)
-                    .lineLimit(1)
-                    .onTapGesture(count: 2) {
-                        onEdit()
+
+                // Priority dot — right-click to change
+                Circle()
+                    .fill(todo.priority.color)
+                    .frame(width: 8, height: 8)
+                    .shadow(color: todo.priority.color.opacity(0.4), radius: 2)
+                    .scaleEffect(isHovered ? 1.15 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isHovered)
+                    .contextMenu {
+                        ForEach(Priority.allCases, id: \.self) { priority in
+                            Button(action: { onChangePriority(priority) }) {
+                                HStack {
+                                    Text(priority.rawValue.capitalized)
+                                    if todo.priority == priority {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+
+                        Divider()
+
+                        Button(action: { showDueDatePicker.toggle() }) {
+                            Label(todo.dueDate != nil ? "Change Due Date" : "Set Due Date", systemImage: "calendar")
+                        }
+                        if todo.dueDate != nil {
+                            Button(role: .destructive, action: { onChangeDueDate(nil) }) {
+                                Label("Remove Due Date", systemImage: "calendar.badge.minus")
+                            }
+                        }
                     }
-                
-                Spacer()
-                
-                Button(action: onDelete) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 8, weight: .bold))
-                        .foregroundColor(.secondary)
-                        .opacity(0.5)
+
+                Button(action: onToggle) {
+                    Image(systemName: todo.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 14))
+                        .foregroundColor(todo.isCompleted ? accentColor : .gray)
+                        .scaleEffect(todo.isCompleted ? 1.0 : (isHovered ? 1.1 : 1.0))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isHovered)
+                        .animation(.spring(response: 0.4, dampingFraction: 0.5), value: todo.isCompleted)
                 }
                 .buttonStyle(PlainButtonStyle())
+
+                if isEditing {
+                    TextField("Edit task...", text: Binding(
+                        get: { editingText },
+                        set: { onEditingTextChange($0) }
+                    ))
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .font(.system(size: 12))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 4)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(4)
+                    .onSubmit { onSaveEdit() }
+                    .onExitCommand { onCancelEdit() }
+
+                    Button(action: onSaveEdit) {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(4)
+                            .background(accentColor)
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(PlainButtonStyle())
+
+                    Button(action: onCancelEdit) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                } else {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(todo.title)
+                            .font(.system(size: 12, weight: isActive && !todo.isCompleted ? .medium : .regular))
+                            .foregroundColor(todo.isCompleted ? themeColors.textSecondary : themeColors.textPrimary)
+                            .strikethrough(todo.isCompleted)
+                            .lineLimit(1)
+
+                        // Due date label
+                        if let due = todo.dueDate, !todo.isCompleted {
+                            HStack(spacing: 3) {
+                                Image(systemName: "calendar")
+                                    .font(.system(size: 8))
+                                Text(Self.shortDateFormatter.string(from: due))
+                                    .font(.system(size: 10))
+                            }
+                            .foregroundColor(dueDateColor)
+                        }
+                    }
+                    .onTapGesture(count: 2) { onEdit() }
+                    .onTapGesture(count: 1) {
+                        if !todo.isCompleted { onTapActive() }
+                    }
+
+                    // Session count badge
+                    if todo.linkedSessionCount > 0 {
+                        HStack(spacing: 2) {
+                            Image(systemName: "timer")
+                                .font(.system(size: 7))
+                            Text("\(todo.linkedSessionCount)")
+                                .font(.system(size: 9, weight: .semibold))
+                        }
+                        .foregroundColor(themeColors.textSecondary)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 1)
+                        .background(Capsule().fill(Color.gray.opacity(0.15)))
+                        .scaleEffect(1.0)
+                        .animation(.spring(response: 0.4, dampingFraction: 0.65), value: todo.linkedSessionCount)
+                        .transition(.scale.combined(with: .opacity))
+                    }
+
+                    Spacer()
+
+                    // Hover-to-reveal delete
+                    if isHovered {
+                        Button(action: onDelete) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 8, weight: .bold))
+                                .foregroundColor(.secondary)
+                                .opacity(0.6)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .transition(.asymmetric(
+                            insertion: .scale(scale: 0.8).combined(with: .opacity),
+                            removal: .scale(scale: 0.6).combined(with: .opacity)
+                        ))
+                    }
+                }
+            }
+
+            // Inline date picker popover
+            if showDueDatePicker {
+                HStack(spacing: 6) {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 10))
+                        .foregroundColor(accentColor)
+                    DatePicker(
+                        "",
+                        selection: Binding(
+                            get: { todo.dueDate ?? Date() },
+                            set: { onChangeDueDate($0) }
+                        ),
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.compact)
+                    .labelsHidden()
+                    .font(.system(size: 11))
+
+                    Spacer()
+
+                    Button(action: { showDueDatePicker = false }) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(accentColor)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                .padding(.top, 4)
+                .padding(.leading, isActive && !todo.isCompleted ? 19 : 16)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
-        .background(Color.gray.opacity(0.05))
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(isActive && !todo.isCompleted
+                    ? accentColor.opacity(0.08)
+                    : themeColors.cardBackground.opacity(isHovered ? 0.5 : 0.3))
+        )
         .cornerRadius(6)
+        .scaleEffect(isHovered && !isEditing ? 1.01 : 1.0)
+        .shadow(
+            color: isActive && !todo.isCompleted ? accentColor.opacity(0.15) : .clear,
+            radius: 4,
+            y: 2
+        )
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showDueDatePicker)
+        .animation(.spring(response: 0.35, dampingFraction: 0.7), value: isActive)
+        .onHover { hovering in
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                isHovered = hovering
+            }
+        }
     }
 }
 
@@ -398,18 +840,20 @@ struct SidebarItem: View {
     let isSelected: Bool
     let accentColor: Color
     let namespace: Namespace.ID
-    
+    var themeColors: ThemeColors = .default
+
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .semibold))
                 .frame(width: 20)
-                .foregroundColor(isSelected ? .white : .secondary)
-            
+                .foregroundColor(isSelected ? .white : themeColors.textSecondary)
+                .shadow(color: isSelected ? accentColor.opacity(0.4 * themeColors.glowIntensity) : .clear, radius: 4 * themeColors.glowIntensity)
+
             Text(title)
                 .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
-                .foregroundColor(isSelected ? .white : .primary)
-            
+                .foregroundColor(isSelected ? .white : themeColors.textPrimary)
+
             Spacer()
         }
         .padding(.vertical, 10)
@@ -419,11 +863,46 @@ struct SidebarItem: View {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(accentColor)
+                        .shadow(color: accentColor.opacity(0.4 * themeColors.glowIntensity), radius: 6 * themeColors.glowIntensity, y: 2)
                         .matchedGeometryEffect(id: "tab", in: namespace)
+                } else if themeColors.glowIntensity > 1.0 {
+                    // Subtle accent-tinted background for high-glow themes (Neon)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(accentColor.opacity(0.08))
                 }
             }
         )
         .contentShape(Rectangle())
+    }
+}
+
+// MARK: - Todo Drop Delegate
+
+struct TodoDropDelegate: DropDelegate {
+    let item: TodoItem
+    @Binding var todos: [TodoItem]
+    @Binding var draggingTodo: TodoItem?
+    let onReorder: () -> Void
+
+    func performDrop(info: DropInfo) -> Bool {
+        draggingTodo = nil
+        onReorder()
+        return true
+    }
+
+    func dropEntered(info: DropInfo) {
+        guard let dragging = draggingTodo,
+              dragging.id != item.id,
+              let fromIndex = todos.firstIndex(where: { $0.id == dragging.id }),
+              let toIndex = todos.firstIndex(where: { $0.id == item.id }) else { return }
+
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+            todos.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex)
+        }
+    }
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
     }
 }
 
