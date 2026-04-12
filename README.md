@@ -1,7 +1,7 @@
 # Tempo
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.2.4-red?style=for-the-badge" alt="Version">
+  <img src="https://img.shields.io/badge/Version-2.0-red?style=for-the-badge" alt="Version">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/Platform-macOS-black?style=for-the-badge" alt="Platform">
   <img src="https://img.shields.io/badge/Checks-passed-green?style=for-the-badge" alt="Checks"></a>
@@ -41,18 +41,26 @@ A typical **pomodoro** (Italian for "tomato") technique consists of:
 - Mini Player (floats on top of windows for quick viewing)
 - Full customization (including: theme color, zen background music, auto-start breaks, etc.)
 - Todo-list support (add, edit, delete, and check your todo items!)
+- AI Insights (on-device productivity analysis, smart session suggestions, and focus quality scores)
 
 ---
 
-## 💡 What's New in v1.2.4
+## 💡 What's New in v2.0
 
 ### New Features
 
-**Tempo is on the App Store!!!**
+**AI Insights**
 
-Download the app from either the app store or from the releases tab (a warning no longer appears when you first open it!)
+Tempo now analyzes your session history on-device to surface personalized productivity recommendations:
+- **Productivity Score** — a composite score based on completion rate, consistency, and interruptions
+- **Smart Suggestions** — recommends the best session length and time of day based on your patterns
+- **Focus Quality** — rates each session and tracks trends over time
+- **Insights cards** — surfaces your peak hours, streak milestones, zen music impact, and more
+- All analysis is 100% private and happens on your Mac — no data leaves your device
 
-Update detection has also been tweaked, and some bugs were patched.
+**Expanded Zen Music Library**
+
+Two new ambient tracks added: *Zen Moods* and *Zen Garden* (joining the existing *Inner Peace*).
 
 ---
 

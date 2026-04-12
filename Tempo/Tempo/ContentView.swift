@@ -35,10 +35,12 @@ struct ContentView: View {
                     case 0:
                         TimerView(timerManager: timerManager)
                     case 1:
-                        StatsView(timerManager: timerManager)
+                        InsightsView(timerManager: timerManager)
                     case 2:
-                        SettingsView(timerManager: timerManager, onResetSettings: resetSettings)
+                        StatsView(timerManager: timerManager)
                     case 3:
+                        SettingsView(timerManager: timerManager, onResetSettings: resetSettings)
+                    case 4:
                         HelpView()
                     default:
                         TimerView(timerManager: timerManager)

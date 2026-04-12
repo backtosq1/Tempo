@@ -220,8 +220,8 @@ struct SidebarView: View {
             .onTapGesture { selectTab(0) }
 
             SidebarItem(
-                title: "Statistics",
-                icon: "chart.bar.fill",
+                title: "Insights",
+                icon: "brain.head.profile",
                 isSelected: selectedTab == 1,
                 accentColor: accentColor,
                 namespace: namespace,
@@ -230,8 +230,8 @@ struct SidebarView: View {
             .onTapGesture { selectTab(1) }
 
             SidebarItem(
-                title: "Settings",
-                icon: "gearshape.fill",
+                title: "Statistics",
+                icon: "chart.bar.fill",
                 isSelected: selectedTab == 2,
                 accentColor: accentColor,
                 namespace: namespace,
@@ -240,14 +240,24 @@ struct SidebarView: View {
             .onTapGesture { selectTab(2) }
 
             SidebarItem(
-                title: "Help & About",
-                icon: "questionmark.circle.fill",
+                title: "Settings",
+                icon: "gearshape.fill",
                 isSelected: selectedTab == 3,
                 accentColor: accentColor,
                 namespace: namespace,
                 themeColors: theme
             )
             .onTapGesture { selectTab(3) }
+
+            SidebarItem(
+                title: "Help & About",
+                icon: "questionmark.circle.fill",
+                isSelected: selectedTab == 4,
+                accentColor: accentColor,
+                namespace: namespace,
+                themeColors: theme
+            )
+            .onTapGesture { selectTab(4) }
         }
         .padding(.horizontal, 10)
         .padding(.top, 8)

@@ -27,6 +27,11 @@ struct SettingsView: View {
     @State private var showingDeleteConfirmation = false
     @State private var sessionToDelete: UUID? = nil
     @State private var editableSessions: [SessionType] = []
+    @State private var showingClearAIConfirmation = false
+    @State private var selectedLocation: String?
+
+    @AppStorage(SettingsKeys.Insights.enableInsights.rawValue) private var enableInsights = true
+    @AppStorage(SettingsKeys.Insights.enablePostSessionFeedback.rawValue) private var enablePostSessionFeedback = false
 
     private var accentColor: Color { themeColor.themeColor }
     private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
@@ -275,6 +280,97 @@ struct SettingsView: View {
                     .padding(.vertical, 8)
                 }
 
+                // AI Insights
+                SettingsSection(title: "AI Insights", icon: "brain.head.profile", accentColor: accentColor, themeColors: theme) {
+                    ToggleRow(
+                        icon: "sparkles",
+                        label: "Enable AI Insights",
+                        isOn: $enableInsights,
+                        accentColor: accentColor
+                    )
+
+                    if enableInsights {
+                        ToggleRow(
+                            icon: "text.bubble",
+                            label: "Post-session feedback prompt",
+                            isOn: $enablePostSessionFeedback,
+                            accentColor: accentColor
+                        )
+
+                        // Location picker
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "location.fill")
+                                    .frame(width: 20)
+                                Text("Current Location")
+                                Spacer()
+                            }
+                            .font(.system(size: 14, weight: .medium))
+
+                            HStack(spacing: 8) {
+                                let locationTags = SettingsStore.shared.locationTags
+
+                                ForEach(locationTags, id: \.self) { tag in
+                                    Button(action: {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                            if selectedLocation == tag {
+                                                selectedLocation = nil
+                                                SettingsStore.shared.currentLocation = nil
+                                            } else {
+                                                selectedLocation = tag
+                                                SettingsStore.shared.currentLocation = tag
+                                            }
+                                        }
+                                    }) {
+                                        Text(tag)
+                                            .font(.system(size: 12, weight: selectedLocation == tag ? .semibold : .regular))
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .background(
+                                                Capsule()
+                                                    .fill(selectedLocation == tag ? accentColor.opacity(0.15) : Color.gray.opacity(0.1))
+                                            )
+                                            .overlay(
+                                                Capsule()
+                                                    .stroke(selectedLocation == tag ? accentColor.opacity(0.4) : Color.clear, lineWidth: 1)
+                                            )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        }
+
+                        Button(action: {
+                            timerManager.seedFocusTestData()
+                            InsightsEngine.shared.refreshInsights(history: timerManager.getSessionHistory())
+                        }) {
+                            HStack {
+                                Image(systemName: "flask.fill")
+                                    .foregroundColor(accentColor)
+                                Text("Generate Test Focus Data")
+                                    .foregroundColor(accentColor)
+                                Spacer()
+                            }
+                            .padding(.vertical, 8)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+
+                        Button(action: {
+                            showingClearAIConfirmation = true
+                        }) {
+                            HStack {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                                Text("Clear AI Data")
+                                    .foregroundColor(.red)
+                                Spacer()
+                            }
+                            .padding(.vertical, 8)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+
                 // Reset & About
                 SettingsSection(title: "About", icon: "info.circle.fill", accentColor: accentColor, themeColors: theme) {
                     VStack(spacing: 16) {
@@ -336,6 +432,7 @@ struct SettingsView: View {
         .background(theme.background)
         .onAppear {
             editableSessions = timerManager.availableSessions
+            selectedLocation = SettingsStore.shared.currentLocation
         }
         .onChange(of: updateManager.isChecking) { _, newValue in
             if !newValue {
@@ -380,6 +477,14 @@ struct SettingsView: View {
             Button("Cancel", role: .cancel) {
                 sessionToDelete = nil
             }
+        }
+        .alert("Clear AI Data?", isPresented: $showingClearAIConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Clear", role: .destructive) {
+                InsightsEngine.shared.clearAllAIData()
+            }
+        } message: {
+            Text("This will delete all cached insights and AI analysis data. Your session history will not be affected.")
         }
     }
 

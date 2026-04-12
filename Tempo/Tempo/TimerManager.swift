@@ -50,6 +50,7 @@ class TimerManager: ObservableObject {
     private let settings = SettingsStore.shared
     private var timer: Timer?
     private var startTime: Date?
+    private var sessionInterruptions: Int = 0
 
     /// Persist activeTaskId to UserDefaults without using didSet
     /// (didSet on @Published can trigger re-entrancy during SwiftUI render cycles)
@@ -126,6 +127,9 @@ class TimerManager: ObservableObject {
     func start() {
         guard state != .running else { return }
 
+        if state == .stopped {
+            sessionInterruptions = 0
+        }
         startTime = Date()
         let newTimer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
@@ -146,6 +150,7 @@ class TimerManager: ObservableObject {
     func pause() {
         timer?.invalidate()
         state = .paused
+        sessionInterruptions += 1
         saveTimerState()
     }
 
@@ -156,13 +161,17 @@ class TimerManager: ObservableObject {
                 sessionType: currentSessionName.isEmpty ? "Focus" : currentSessionName,
                 duration: Date().timeIntervalSince(startTime),
                 completed: false,
-                linkedTaskId: activeTaskId
+                linkedTaskId: activeTaskId,
+                plannedDuration: focusTime,
+                interruptionCount: sessionInterruptions,
+                zenMusicEnabled: settings.enableZenMusic
             )
             appendSessionRecord(record)
         }
         timer?.invalidate()
         startTime = nil
         state = .stopped
+        sessionInterruptions = 0
         setActiveTask(nil)
         resetTimer()
         resetTimerState()
@@ -207,7 +216,10 @@ class TimerManager: ObservableObject {
                     sessionType: currentSessionName.isEmpty ? "Focus" : currentSessionName,
                     duration: Date().timeIntervalSince(startTime),
                     completed: false,
-                    linkedTaskId: activeTaskId
+                    linkedTaskId: activeTaskId,
+                    plannedDuration: focusTime,
+                    interruptionCount: sessionInterruptions,
+                    zenMusicEnabled: settings.enableZenMusic
                 )
                 appendSessionRecord(record)
             }
@@ -332,6 +344,104 @@ class TimerManager: ObservableObject {
         objectWillChange.send()
     }
 
+    func seedFocusTestData() {
+        let calendar = Calendar.current
+        let today = Date()
+        var testRecords: [SessionRecord] = []
+
+        // Generate realistic session data over the past 14 days
+        let sessionTypes = ["Focus", "Deep Work", "Quick"]
+        let durations = [15, 25, 50] // minutes
+
+        for daysAgo in 0..<14 {
+            guard let date = calendar.date(byAdding: .day, value: -daysAgo, to: today) else { continue }
+
+            // 3-6 sessions per day
+            let sessionCount = Int.random(in: 3...6)
+
+            for sessionIndex in 0..<sessionCount {
+                // Spread sessions throughout the day
+                let hour = [9, 11, 14, 16, 19, 21].randomElement() ?? 14
+                guard let sessionDate = calendar.date(bySettingHour: hour, minute: Int.random(in: 0...59), second: 0, of: date) else { continue }
+
+                let sessionType = sessionTypes.randomElement() ?? "Focus"
+                let plannedMinutes = durations.randomElement() ?? 25
+                let plannedDuration = TimeInterval(plannedMinutes * 60)
+
+                // 80% completion rate
+                let completed = Double.random(in: 0...1) < 0.8
+                let actualDuration = completed ? plannedDuration : plannedDuration * Double.random(in: 0.4...0.9)
+
+                // Random interruptions (0-3)
+                let interruptions = Int.random(in: 0...3)
+
+                // Zen music ~40% of the time
+                let zenMusic = Double.random(in: 0...1) < 0.4
+
+                // Calculate quality score
+                let avgQuality = testRecords.suffix(5).compactMap(\.focusQualityScore).reduce(0, +) / Double(max(1, testRecords.suffix(5).count))
+                let qualityScore = FocusQualityModel.score(
+                    for: SessionRecord(
+                        date: sessionDate,
+                        sessionType: sessionType,
+                        duration: actualDuration,
+                        completed: completed,
+                        plannedDuration: plannedDuration,
+                        interruptionCount: interruptions,
+                        zenMusicEnabled: zenMusic
+                    ),
+                    recentAvgQuality: avgQuality
+                )
+
+                let record = SessionRecord(
+                    date: sessionDate,
+                    sessionType: sessionType,
+                    duration: actualDuration,
+                    completed: completed,
+                    linkedTaskId: nil,
+                    plannedDuration: plannedDuration,
+                    interruptionCount: interruptions,
+                    zenMusicEnabled: zenMusic,
+                    focusQualityScore: qualityScore
+                )
+
+                testRecords.append(record)
+            }
+        }
+
+        // Save to settings
+        settings.sessionHistory = testRecords.sorted { $0.date < $1.date }
+
+        // Update stats to match
+        let totalMinutes = testRecords.filter(\.completed).reduce(0.0) { $0 + $1.duration }
+        settings.totalFocusTime = totalMinutes
+        settings.totalSessions = testRecords.filter(\.completed).count
+
+        let todayRecords = testRecords.filter { calendar.isDateInToday($0.date) && $0.completed }
+        settings.todaySessions = todayRecords.count
+
+        // Update weekly data
+        var weeklyData: [String: (sessions: Int, minutes: Double)] = [:]
+        for record in testRecords.filter(\.completed) {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            let dateString = dateFormatter.string(from: record.date)
+
+            var stat = weeklyData[dateString] ?? (0, 0.0)
+            stat.sessions += 1
+            stat.minutes += record.duration / 60.0
+            weeklyData[dateString] = stat
+        }
+
+        let dailyStats = weeklyData.map { DailyStat(date: $0.key, sessions: $0.value.sessions, minutes: $0.value.minutes) }
+        if let encoded = try? JSONEncoder().encode(dailyStats),
+           let jsonString = String(data: encoded, encoding: .utf8) {
+            settings.weeklyDataJSON = jsonString
+        }
+
+        objectWillChange.send()
+    }
+
     // MARK: - Private Methods
     private func timerCompleted() {
         timer?.invalidate()
@@ -360,7 +470,10 @@ class TimerManager: ObservableObject {
                     sessionType: currentSessionName.isEmpty ? "Focus" : currentSessionName,
                     duration: elapsedTime,
                     completed: true,
-                    linkedTaskId: activeTaskId
+                    linkedTaskId: activeTaskId,
+                    plannedDuration: focusTime,
+                    interruptionCount: sessionInterruptions,
+                    zenMusicEnabled: settings.enableZenMusic
                 )
                 appendSessionRecord(record)
 

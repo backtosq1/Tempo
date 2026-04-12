@@ -142,6 +142,8 @@ struct HelpView: View {
 
                     VStack(alignment: .leading, spacing: 10) {
                         CreditRow(label: "Zen Music", value: "\"Inner Peace\" by Grand_Project (Pixabay)")
+                        CreditRow(label: "Zen Music", value: "\"Zen Moods\" by djovan (Pixabay)")
+                        CreditRow(label: "Zen Music", value: "\"Zen Garden\" by Grand_Project (Pixabay)")
                         CreditRow(label: "App Icon", value: "Created by Backtosq1")
                     }
                     .padding(16)

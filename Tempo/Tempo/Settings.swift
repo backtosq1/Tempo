@@ -36,6 +36,12 @@ enum SettingsKeys {
         case achievements, zenSessionCount, earlyBirdCount, nightOwlCount
     }
 
+    enum Insights: String, CaseIterable {
+        case enableInsights, currentLocation, locationTags
+        case insightCache, lastInsightCheck, hasSeenAIPrivacyNotice
+        case enablePostSessionFeedback
+    }
+
     enum Persistence: String, CaseIterable {
         case savedTimerState
     }
@@ -238,7 +244,53 @@ final class SettingsStore: ObservableObject {
         get { defaults.integer(forKey: SettingsKeys.Achievements.nightOwlCount.rawValue) }
         set { defaults.set(newValue, forKey: SettingsKeys.Achievements.nightOwlCount.rawValue) }
     }
-    
+
+    // MARK: AI Insights Settings
+    var enableInsights: Bool {
+        get { defaults.object(forKey: SettingsKeys.Insights.enableInsights.rawValue) as? Bool ?? true }
+        set { defaults.set(newValue, forKey: SettingsKeys.Insights.enableInsights.rawValue) }
+    }
+
+    var enablePostSessionFeedback: Bool {
+        get { defaults.object(forKey: SettingsKeys.Insights.enablePostSessionFeedback.rawValue) as? Bool ?? false }
+        set { defaults.set(newValue, forKey: SettingsKeys.Insights.enablePostSessionFeedback.rawValue) }
+    }
+
+    var hasSeenAIPrivacyNotice: Bool {
+        get { defaults.object(forKey: SettingsKeys.Insights.hasSeenAIPrivacyNotice.rawValue) as? Bool ?? false }
+        set { defaults.set(newValue, forKey: SettingsKeys.Insights.hasSeenAIPrivacyNotice.rawValue) }
+    }
+
+    var currentLocation: String? {
+        get { defaults.string(forKey: SettingsKeys.Insights.currentLocation.rawValue) }
+        set { defaults.set(newValue, forKey: SettingsKeys.Insights.currentLocation.rawValue) }
+    }
+
+    var locationTags: [String] {
+        get { defaults.stringArray(forKey: SettingsKeys.Insights.locationTags.rawValue) ?? ["Home", "Library", "Coffee Shop", "Office"] }
+        set { defaults.set(newValue, forKey: SettingsKeys.Insights.locationTags.rawValue) }
+    }
+
+    var lastInsightCheck: Date? {
+        get { defaults.object(forKey: SettingsKeys.Insights.lastInsightCheck.rawValue) as? Date }
+        set { defaults.set(newValue, forKey: SettingsKeys.Insights.lastInsightCheck.rawValue) }
+    }
+
+    var insightCache: [CachedInsight] {
+        get {
+            guard let data = defaults.data(forKey: SettingsKeys.Insights.insightCache.rawValue),
+                  let insights = try? JSONDecoder().decode([CachedInsight].self, from: data) else {
+                return []
+            }
+            return insights
+        }
+        set {
+            if let data = try? JSONEncoder().encode(newValue) {
+                defaults.set(data, forKey: SettingsKeys.Insights.insightCache.rawValue)
+            }
+        }
+    }
+
     private init() {}
 }
 
@@ -362,6 +414,31 @@ struct TodoItem: Identifiable, Codable, Hashable {
     }
 }
 
+// MARK: - Session Time of Day
+
+enum SessionTimeOfDay: String, Codable {
+    case earlyMorning   // 5am-9am
+    case lateMorning    // 9am-12pm
+    case earlyAfternoon // 12pm-3pm
+    case lateAfternoon  // 3pm-6pm
+    case evening        // 6pm-9pm
+    case night          // 9pm-12am
+    case lateNight      // 12am-5am
+
+    static func from(date: Date) -> SessionTimeOfDay {
+        let hour = Calendar.current.component(.hour, from: date)
+        switch hour {
+        case 5..<9: return .earlyMorning
+        case 9..<12: return .lateMorning
+        case 12..<15: return .earlyAfternoon
+        case 15..<18: return .lateAfternoon
+        case 18..<21: return .evening
+        case 21..<24: return .night
+        default: return .lateNight
+        }
+    }
+}
+
 // MARK: - Session Record
 struct SessionRecord: Codable, Identifiable {
     var id: UUID
@@ -371,13 +448,59 @@ struct SessionRecord: Codable, Identifiable {
     var completed: Bool
     var linkedTaskId: UUID?
 
-    init(id: UUID = UUID(), date: Date = Date(), sessionType: String, duration: TimeInterval, completed: Bool, linkedTaskId: UUID? = nil) {
+    // AI/ML fields
+    var plannedDuration: TimeInterval
+    var interruptionCount: Int
+    var zenMusicEnabled: Bool
+    var focusQualityScore: Double?
+    var timeOfDay: SessionTimeOfDay
+
+    init(
+        id: UUID = UUID(),
+        date: Date = Date(),
+        sessionType: String,
+        duration: TimeInterval,
+        completed: Bool,
+        linkedTaskId: UUID? = nil,
+        plannedDuration: TimeInterval? = nil,
+        interruptionCount: Int = 0,
+        zenMusicEnabled: Bool = false,
+        focusQualityScore: Double? = nil,
+        timeOfDay: SessionTimeOfDay? = nil
+    ) {
         self.id = id
         self.date = date
         self.sessionType = sessionType
         self.duration = duration
         self.completed = completed
         self.linkedTaskId = linkedTaskId
+        self.plannedDuration = plannedDuration ?? duration
+        self.interruptionCount = interruptionCount
+        self.zenMusicEnabled = zenMusicEnabled
+        self.focusQualityScore = focusQualityScore
+        self.timeOfDay = timeOfDay ?? SessionTimeOfDay.from(date: date)
+    }
+
+    // Migration-safe decoding for existing data without new fields
+    enum CodingKeys: String, CodingKey {
+        case id, date, sessionType, duration, completed, linkedTaskId
+        case plannedDuration, interruptionCount, zenMusicEnabled
+        case focusQualityScore, timeOfDay
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        date = try container.decode(Date.self, forKey: .date)
+        sessionType = try container.decode(String.self, forKey: .sessionType)
+        duration = try container.decode(TimeInterval.self, forKey: .duration)
+        completed = try container.decode(Bool.self, forKey: .completed)
+        linkedTaskId = try container.decodeIfPresent(UUID.self, forKey: .linkedTaskId)
+        plannedDuration = try container.decodeIfPresent(TimeInterval.self, forKey: .plannedDuration) ?? duration
+        interruptionCount = try container.decodeIfPresent(Int.self, forKey: .interruptionCount) ?? 0
+        zenMusicEnabled = try container.decodeIfPresent(Bool.self, forKey: .zenMusicEnabled) ?? false
+        focusQualityScore = try container.decodeIfPresent(Double.self, forKey: .focusQualityScore)
+        timeOfDay = try container.decodeIfPresent(SessionTimeOfDay.self, forKey: .timeOfDay) ?? SessionTimeOfDay.from(date: date)
     }
 }
 
@@ -391,6 +514,18 @@ struct Achievement: Identifiable, Codable {
     var unlockedDate: Date?
     var progress: Int
     let goal: Int
+}
+
+// MARK: - Cached Insight
+struct CachedInsight: Codable, Identifiable {
+    var id: UUID
+    var type: String
+    var title: String
+    var message: String
+    var generatedAt: Date
+    var priority: Int
+    var actionable: Bool
+    var dismissed: Bool
 }
 
 // MARK: - Timer State Data

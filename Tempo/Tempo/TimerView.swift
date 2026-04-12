@@ -379,8 +379,8 @@ struct TimerView: View {
                     HStack(spacing: 8) {
                         Image(systemName: zenPlayer.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                             .font(.system(size: 18))
-                        
-                        Text(zenPlayer.isPlaying ? "Inner Peace" : "Play Zen Music")
+
+                        Text(zenPlayer.isPlaying ? zenPlayer.getCurrentStationName() : "Play Zen Music")
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundColor(zenPlayer.isPlaying ? accentColor : .secondary)
@@ -392,6 +392,18 @@ struct TimerView: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
+
+                Button(action: {
+                    zenPlayer.nextStation()
+                }) {
+                    Image(systemName: "forward.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                        .padding(8)
+                        .background(Circle().fill(Color.gray.opacity(0.1)))
+                }
+                .buttonStyle(PlainButtonStyle())
+                .help("Next track")
             }
             .padding(.top, 16)
             .onChange(of: timerManager.mode) { _, newMode in

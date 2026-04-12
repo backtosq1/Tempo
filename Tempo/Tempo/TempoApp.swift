@@ -15,7 +15,7 @@ struct TempoApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(timerManager)
-                .frame(minWidth: 650, minHeight: 700)
+                .frame(minWidth: 650, minHeight: 750)
                 .onAppear {
                     setupKeyMonitors()
                     setupNotificationObservers()
