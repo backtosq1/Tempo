@@ -126,13 +126,13 @@ struct MiniPlayerView: View {
                                         .font(.system(size: 11))
                                         .foregroundColor(theme.textSecondary)
                                 }
+                                Spacer(minLength: 0)
                             }
                         }
                         .menuStyle(.borderlessButton)
-                        .fixedSize()
                     }
                 }
-                .frame(minWidth: 70, alignment: .leading)
+                .frame(maxWidth: 85, alignment: .leading)
 
                 Spacer()
 
@@ -143,6 +143,7 @@ struct MiniPlayerView: View {
                     .foregroundColor(theme.textPrimary)
                     .contentTransition(.numericText())
                     .animation(.linear(duration: 0.3), value: timerManager.timeRemaining)
+                    .fixedSize()
 
                 Spacer()
 

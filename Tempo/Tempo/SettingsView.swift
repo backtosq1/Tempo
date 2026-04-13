@@ -340,7 +340,7 @@ struct SettingsView: View {
                             }
                         }
 
-                        Button(action: {
+                        /* Button(action: {
                             timerManager.seedFocusTestData()
                             InsightsEngine.shared.refreshInsights(history: timerManager.getSessionHistory())
                         }) {
@@ -354,6 +354,8 @@ struct SettingsView: View {
                             .padding(.vertical, 8)
                         }
                         .buttonStyle(PlainButtonStyle())
+                         
+                         */
 
                         Button(action: {
                             showingClearAIConfirmation = true
