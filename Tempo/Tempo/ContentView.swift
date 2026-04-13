@@ -17,7 +17,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             SidebarView(selectedTab: $selectedTab)
-                .frame(minWidth: 180, idealWidth: 200, maxWidth: 220)
+                .frame(minWidth: 180, idealWidth: 220, maxWidth: 320)
 
             mainContentView
         }

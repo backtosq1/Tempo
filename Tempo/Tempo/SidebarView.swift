@@ -261,8 +261,9 @@ struct SidebarView: View {
         }
         .padding(.horizontal, 10)
         .padding(.top, 8)
+        .frame(maxWidth: .infinity)
     }
-    
+
     private var todoSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Section header with count
@@ -549,8 +550,9 @@ struct SidebarView: View {
                 .padding(.horizontal, 12)
             }
         }
+        .frame(maxWidth: .infinity)
     }
-    
+
     private var miniPlayerButton: some View {
         Button(action: {
             NotificationCenter.default.post(name: .openMiniPlayer, object: nil)
@@ -655,36 +657,13 @@ struct TodoRow: View {
                         }
                 }
 
-                // Priority dot — right-click to change
+                // Priority dot
                 Circle()
                     .fill(todo.priority.color)
                     .frame(width: 8, height: 8)
                     .shadow(color: todo.priority.color.opacity(0.4), radius: 2)
                     .scaleEffect(isHovered ? 1.15 : 1.0)
                     .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isHovered)
-                    .contextMenu {
-                        ForEach(Priority.allCases, id: \.self) { priority in
-                            Button(action: { onChangePriority(priority) }) {
-                                HStack {
-                                    Text(priority.rawValue.capitalized)
-                                    if todo.priority == priority {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
-                            }
-                        }
-
-                        Divider()
-
-                        Button(action: { showDueDatePicker.toggle() }) {
-                            Label(todo.dueDate != nil ? "Change Due Date" : "Set Due Date", systemImage: "calendar")
-                        }
-                        if todo.dueDate != nil {
-                            Button(role: .destructive, action: { onChangeDueDate(nil) }) {
-                                Label("Remove Due Date", systemImage: "calendar.badge.minus")
-                            }
-                        }
-                    }
 
                 Button(action: onToggle) {
                     Image(systemName: todo.isCompleted ? "checkmark.circle.fill" : "circle")
@@ -769,15 +748,45 @@ struct TodoRow: View {
 
                     Spacer()
 
-                    // Hover-to-reveal delete
+                    // Hover-to-reveal menu button
                     if isHovered {
-                        Button(action: onDelete) {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 8, weight: .bold))
-                                .foregroundColor(.secondary)
-                                .opacity(0.6)
+                        Menu {
+                            Button(action: { showDueDatePicker.toggle() }) {
+                                Label(todo.dueDate != nil ? "Change Due Date" : "Set Due Date", systemImage: "calendar")
+                            }
+                            if todo.dueDate != nil {
+                                Button(role: .destructive, action: { onChangeDueDate(nil) }) {
+                                    Label("Remove Due Date", systemImage: "calendar.badge.minus")
+                                }
+                            }
+                            Divider()
+                            ForEach(Priority.allCases, id: \.self) { priority in
+                                Button(action: { onChangePriority(priority) }) {
+                                    HStack {
+                                        Text(priority.rawValue.capitalized)
+                                        if todo.priority == priority {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                            Divider()
+                            Button(action: onEdit) {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            Button(role: .destructive, action: onDelete) {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 9, weight: .medium))
+                                .foregroundColor(.secondary.opacity(0.5))
+                                .frame(width: 20, height: 20)
+                                .contentShape(Rectangle())
                         }
-                        .buttonStyle(PlainButtonStyle())
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.hidden)
+                        .fixedSize()
                         .transition(.asymmetric(
                             insertion: .scale(scale: 0.8).combined(with: .opacity),
                             removal: .scale(scale: 0.6).combined(with: .opacity)
@@ -840,6 +849,38 @@ struct TodoRow: View {
                 isHovered = hovering
             }
         }
+        .contextMenu {
+            Button(action: { showDueDatePicker.toggle() }) {
+                Label(todo.dueDate != nil ? "Change Due Date" : "Set Due Date", systemImage: "calendar")
+            }
+            if todo.dueDate != nil {
+                Button(role: .destructive, action: { onChangeDueDate(nil) }) {
+                    Label("Remove Due Date", systemImage: "calendar.badge.minus")
+                }
+            }
+
+            Divider()
+
+            ForEach(Priority.allCases, id: \.self) { priority in
+                Button(action: { onChangePriority(priority) }) {
+                    HStack {
+                        Text(priority.rawValue.capitalized)
+                        if todo.priority == priority {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+
+            Divider()
+
+            Button(action: onEdit) {
+                Label("Edit", systemImage: "pencil")
+            }
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
 }
 
@@ -883,6 +924,7 @@ struct SidebarItem: View {
             }
         )
         .contentShape(Rectangle())
+        .frame(maxWidth: .infinity)
     }
 }
 
