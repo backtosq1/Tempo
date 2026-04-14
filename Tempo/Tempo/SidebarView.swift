@@ -23,6 +23,7 @@ struct SidebarView: View {
     @State private var newTodoDueDate: Date? = nil
     @State private var showDatePicker: Bool = false
 
+    @State private var showTaskHint: Bool = false
     @State private var draggingTodo: TodoItem? = nil
     @State private var showCompleted: Bool = false
 
@@ -287,6 +288,32 @@ struct SidebarView: View {
                 }
 
                 Spacer()
+
+                Button(action: { showTaskHint.toggle() }) {
+                    Image(systemName: "questionmark.circle")
+                        .font(.system(size: 11))
+                        .foregroundColor(theme.textSecondary.opacity(0.5))
+                }
+                .buttonStyle(PlainButtonStyle())
+                .popover(isPresented: $showTaskHint, arrowEdge: .bottom) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "cursorarrow")
+                                .font(.system(size: 12))
+                                .frame(width: 16)
+                            Text("Click to set as active task")
+                                .font(.system(size: 12))
+                        }
+                        HStack(spacing: 8) {
+                            Image(systemName: "cursorarrow.motionlines")
+                                .font(.system(size: 12))
+                                .frame(width: 16)
+                            Text("Right-click for more options")
+                                .font(.system(size: 12))
+                        }
+                    }
+                    .padding(14)
+                }
 
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -703,6 +730,7 @@ struct TodoRow: View {
                         Image(systemName: "xmark")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.secondary)
+                            .padding(.leading, 3)
                     }
                     .buttonStyle(PlainButtonStyle())
                 } else {
@@ -724,8 +752,7 @@ struct TodoRow: View {
                             .foregroundColor(dueDateColor)
                         }
                     }
-                    .onTapGesture(count: 2) { onEdit() }
-                    .onTapGesture(count: 1) {
+                    .onTapGesture {
                         if !todo.isCompleted { onTapActive() }
                     }
 

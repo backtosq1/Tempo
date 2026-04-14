@@ -61,76 +61,79 @@ struct MiniPlayerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 14) {
-                // Left: mode + task selector
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 4) {
-                        Text(modeEmoji)
-                            .font(.system(size: 9))
-                        Text(timerManager.mode.rawValue.uppercased())
-                            .font(.system(size: 9, weight: .bold))
-                            .tracking(0.8)
-                            .foregroundColor(accentColor)
+            // Top: task selector
+            HStack(spacing: 3) {
+                Text("📌")
+                    .font(.system(size: 9))
+
+                Menu {
+                    Button(action: { timerManager.setActiveTask(nil) }) {
+                        HStack {
+                            Text("No Task")
+                            if timerManager.activeTaskId == nil {
+                                Image(systemName: "checkmark")
+                            }
+                        }
                     }
 
-                    HStack(spacing: 3) {
-                        Text("📌")
-                            .font(.system(size: 9))
+                    if !incompleteTodos.isEmpty {
+                        Divider()
 
-                        Menu {
-                            Button(action: { timerManager.setActiveTask(nil) }) {
+                        ForEach(incompleteTodos) { todo in
+                            Button(action: { timerManager.setActiveTask(todo.id) }) {
                                 HStack {
-                                    Text("No Task")
-                                    if timerManager.activeTaskId == nil {
+                                    Circle()
+                                        .fill(todo.priority.color)
+                                        .frame(width: 8, height: 8)
+                                    Text(todo.title)
+                                    if let due = todo.dueDate {
+                                        Text("· \(Self.shortDateFormatter.string(from: due))")
+                                            .foregroundColor(dueDateColor(for: due))
+                                    }
+                                    if timerManager.activeTaskId == todo.id {
                                         Image(systemName: "checkmark")
                                     }
                                 }
                             }
-
-                            if !incompleteTodos.isEmpty {
-                                Divider()
-
-                                ForEach(incompleteTodos) { todo in
-                                    Button(action: { timerManager.setActiveTask(todo.id) }) {
-                                        HStack {
-                                            Circle()
-                                                .fill(todo.priority.color)
-                                                .frame(width: 8, height: 8)
-                                            Text(todo.title)
-                                            if let due = todo.dueDate {
-                                                Text("· \(Self.shortDateFormatter.string(from: due))")
-                                                    .foregroundColor(dueDateColor(for: due))
-                                            }
-                                            if timerManager.activeTaskId == todo.id {
-                                                Image(systemName: "checkmark")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } label: {
-                            HStack(spacing: 4) {
-                                if let task = activeTask {
-                                    Text(task.title)
-                                        .font(.system(size: 11))
-                                        .foregroundColor(theme.textPrimary)
-                                        .lineLimit(1)
-
-                                    if let due = task.dueDate {
-                                        Text(Self.shortDateFormatter.string(from: due))
-                                            .font(.system(size: 9))
-                                            .foregroundColor(dueDateColor(for: due))
-                                    }
-                                } else {
-                                    Text("Select Task")
-                                        .font(.system(size: 11))
-                                        .foregroundColor(theme.textSecondary)
-                                }
-                                Spacer(minLength: 0)
-                            }
                         }
-                        .menuStyle(.borderlessButton)
                     }
+                } label: {
+                    HStack(spacing: 4) {
+                        if let task = activeTask {
+                            Text(task.title)
+                                .font(.system(size: 11))
+                                .foregroundColor(theme.textPrimary)
+                                .lineLimit(1)
+
+                            if let due = task.dueDate {
+                                Text(Self.shortDateFormatter.string(from: due))
+                                    .font(.system(size: 9))
+                                    .foregroundColor(dueDateColor(for: due))
+                            }
+                        } else {
+                            Text("Select Task")
+                                .font(.system(size: 11))
+                                .foregroundColor(theme.textSecondary)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                }
+                .menuStyle(.borderlessButton)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 10)
+            .padding(.bottom, 4)
+
+            // Bottom: mode + timer + controls
+            HStack(spacing: 14) {
+                // Left: mode label
+                HStack(spacing: 4) {
+                    Text(modeEmoji)
+                        .font(.system(size: 9))
+                    Text(timerManager.mode.rawValue.uppercased())
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(0.8)
+                        .foregroundColor(accentColor)
                 }
                 .frame(maxWidth: 85, alignment: .leading)
 
@@ -177,7 +180,6 @@ struct MiniPlayerView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.top, 12)
             .padding(.bottom, 10)
 
             // Progress bar — centered at bottom with padding

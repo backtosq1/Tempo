@@ -395,6 +395,10 @@ struct AchievementCard: View {
         .frame(maxWidth: .infinity)
         .background(themeColors.cardBackground)
         .cornerRadius(12)
+        .help(achievement.isUnlocked
+            ? "\(achievement.description)\nUnlocked!"
+            : "\(achievement.description) (\(achievement.progress)/\(achievement.goal))"
+        )
         .opacity(achievement.isUnlocked ? 1 : 0.6)
         .scaleEffect(appear ? 1 : 0.9)
         .onAppear {

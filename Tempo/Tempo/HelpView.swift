@@ -78,6 +78,13 @@ struct HelpView: View {
                             theme: theme
                         )
                         FeatureCard(
+                            icon: "brain",
+                            title: "AI Insights",
+                            description: "On-device ML analyzes your sessions to provide even more personalized focus recommendations",
+                            accent: accentColor,
+                            theme: theme
+                        )
+                        FeatureCard(
                             icon: "trophy",
                             title: "Achievements",
                             description: "12 unlockable milestones like Early Bird, Streak Master, and more",
@@ -131,6 +138,48 @@ struct HelpView: View {
                         ShortcutRow(keys: "⌘ M", action: "Open Mini Player")
                     }
                     .padding(.vertical, 4)
+                    .background(theme.cardBackground)
+                    .cornerRadius(12)
+                    .shadow(color: theme.cardShadow, radius: theme.shadowRadius / 2, y: 2)
+                }
+
+                // AI & ML Features
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionLabel(text: "AI & Machine Learning")
+
+                    VStack(spacing: 0) {
+                        AIFeatureRow(
+                            icon: "chart.line.uptrend.xyaxis",
+                            title: "Productivity Peak Detection",
+                            description: "Identifies which hours and days you focus best based on your session history.",
+                            accent: accentColor,
+                            theme: theme
+                        )
+                        Divider().padding(.horizontal, 12)
+                        AIFeatureRow(
+                            icon: "waveform.path.ecg",
+                            title: "Focus Quality Scoring",
+                            description: "Scores each session using duration, completion, and time-of-day patterns to measure true focus quality.",
+                            accent: accentColor,
+                            theme: theme
+                        )
+                        Divider().padding(.horizontal, 12)
+                        AIFeatureRow(
+                            icon: "lightbulb.fill",
+                            title: "Smart Session Suggestions",
+                            description: "Recommends an optimal session length based on your recent performance and patterns.",
+                            accent: accentColor,
+                            theme: theme
+                        )
+                        Divider().padding(.horizontal, 12)
+                        AIFeatureRow(
+                            icon: "lock.shield",
+                            title: "On-Device & Private",
+                            description: "All analysis runs locally on your Mac. No data ever leaves your device.",
+                            accent: accentColor,
+                            theme: theme
+                        )
+                    }
                     .background(theme.cardBackground)
                     .cornerRadius(12)
                     .shadow(color: theme.cardShadow, radius: theme.shadowRadius / 2, y: 2)
@@ -365,5 +414,37 @@ struct TipItem: View {
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+}
+
+private struct AIFeatureRow: View {
+    let icon: String
+    let title: String
+    let description: String
+    let accent: Color
+    let theme: ThemeColors
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(accent)
+                .frame(width: 20)
+                .padding(.top, 1)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold))
+
+                Text(description)
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
 }

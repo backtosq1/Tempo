@@ -339,8 +339,10 @@ struct SettingsView: View {
                                 }
                             }
                         }
-
-                        /* Button(action: {
+                        
+                        
+                        // MARK: - Test Focus Data Button
+                        Button(action: {
                             timerManager.seedFocusTestData()
                             InsightsEngine.shared.refreshInsights(history: timerManager.getSessionHistory())
                         }) {
@@ -355,7 +357,7 @@ struct SettingsView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                          
-                         */
+                        
 
                         Button(action: {
                             showingClearAIConfirmation = true
