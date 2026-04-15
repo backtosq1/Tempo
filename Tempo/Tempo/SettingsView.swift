@@ -342,6 +342,7 @@ struct SettingsView: View {
                         
                         
                         // MARK: - Test Focus Data Button
+                        /*
                         Button(action: {
                             timerManager.seedFocusTestData()
                             InsightsEngine.shared.refreshInsights(history: timerManager.getSessionHistory())
@@ -356,7 +357,7 @@ struct SettingsView: View {
                             .padding(.vertical, 8)
                         }
                         .buttonStyle(PlainButtonStyle())
-                         
+                        */
                         
 
                         Button(action: {
