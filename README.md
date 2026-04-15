@@ -68,7 +68,11 @@ Two new ambient tracks added: *Zen Moods* and *Zen Garden* (joining the existing
 
 ### Download
 
-Download it from the app store or download the `.dmg` file from the [latest release](https://github.com/your-repo/releases) and drag the app into the Applications folder.
+Download the `.dmg` file from the [latest release](https://github.com/your-repo/releases) and drag the app into the Applications folder
+
+OR
+
+Install the app from [the App Store](https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12)
 
 
 ### 🔧 Required Permissions
