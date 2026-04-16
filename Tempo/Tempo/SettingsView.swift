@@ -385,7 +385,7 @@ struct SettingsView: View {
                             HStack {
                                 Image(systemName: "arrow.down.circle")
                                     .foregroundColor(accentColor)
-                                Text("Check for Updates")
+                                Text("Check for Updates in App Store")
                                     .foregroundColor(accentColor)
                                 Spacer()
                                 if updateManager.isChecking {

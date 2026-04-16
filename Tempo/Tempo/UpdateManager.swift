@@ -77,17 +77,17 @@ final class UpdateManager: ObservableObject {
     }
     
     func openAppStore() {
-        #if os(macOS)
+#if os(macOS)
         if let url = URL(string: "macappstore://itunes.apple.com/app/id\(getAppStoreId())") {
             NSWorkspace.shared.open(url)
         } else if let url = URL(string: appStoreUrl) {
             NSWorkspace.shared.open(url)
         }
-        #else
+#else
         if let url = URL(string: appStoreUrl) {
             UIApplication.shared.open(url)
         }
-        #endif
+#endif
     }
     
     private func getAppStoreId() -> String {
