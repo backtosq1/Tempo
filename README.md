@@ -5,11 +5,15 @@
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/Platform-macOS-black?style=for-the-badge" alt="Platform">
   <img src="https://img.shields.io/badge/Checks-passed-green?style=for-the-badge" alt="Checks"></a>
+  <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="140" height="40" alt="Download_on_the_Mac_App_Store_Badge_CNSC_RGB_wht_092917" src="https://github.com/user-attachments/assets/bed60738-7df6-43e1-b945-7caa5040c7c9" /></a>
+<a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="156" height="40" alt="Download_on_the_Mac_App_Store_Badge_US-UK_RGB_wht_092917" src="https://github.com/user-attachments/assets/56268041-4729-42db-bb59-ac96374b8600"/></a>
 </p>
+  
+  
 
 <p align="center">
   <strong>A focus timer for students.</strong><br>
-  Level up your work with a customizable systematic focus routine, focus statistics, and more!
+  Level up your work with a customizable systematic focus routine, AI-powered focus recommendations, productivity statistics, and more!
 </p>
 
 ---
@@ -72,7 +76,10 @@ Download the `.dmg` file from the [latest release](https://github.com/your-repo/
 
 OR
 
-Install the app from [the App Store](https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12)
+Install the app from the App Store:
+
+<a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="140" height="40" alt="Download_on_the_Mac_App_Store_Badge_CNSC_RGB_wht_092917" src="https://github.com/user-attachments/assets/bed60738-7df6-43e1-b945-7caa5040c7c9" /></a>
+<a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="156" height="40" alt="Download_on_the_Mac_App_Store_Badge_US-UK_RGB_wht_092917" src="https://github.com/user-attachments/assets/56268041-4729-42db-bb59-ac96374b8600"/></a>
 
 
 ### 🔧 Required Permissions
