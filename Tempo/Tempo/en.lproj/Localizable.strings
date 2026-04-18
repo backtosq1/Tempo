@@ -1,0 +1,356 @@
+// =============================================
+// Tempo - English Localizable Strings
+// =============================================
+
+// MARK: - Onboarding
+
+// Language Picker
+"onb.lang.subtitle" = "Choose your language";
+"onb.lang.continue" = "Continue";
+
+// Page 1 - Welcome
+"onb.p1.title" = "Welcome to Tempo";
+"onb.p1.body" = "A beautiful Pomodoro timer designed to help you focus deeply and build lasting habits.";
+
+// Page 2 - Custom Sessions
+"onb.p2.title" = "Your Sessions, Your Rules";
+"onb.p2.body" = "Choose from built-in presets like Deep Work or Quick Sprint, or craft your own with custom durations and colors.";
+
+// Page 3 - Zen Music
+"onb.p3.title" = "Focus with Zen Music";
+"onb.p3.body" = "Enable built-in ambient tracks — Inner Peace, Zen Moods, Zen Garden — to create a distraction-free soundscape during focus sessions.";
+
+// Page 4 - AI Insights
+"onb.p4.title" = "Insights That Learn You";
+"onb.p4.body" = "After 10 sessions, Tempo analyses your patterns — best focus hours, streak momentum, session quality — and surfaces actionable suggestions. All processing stays on-device.";
+
+// Page 5 - Achievements
+"onb.p5.title" = "Earn Achievements";
+"onb.p5.body" = "From \"First Focus\" to \"Zen Master\" and \"Week Warrior\" — milestones celebrate your consistency and keep you motivated.";
+
+// Navigation
+"onb.nav.next" = "Next";
+"onb.nav.back" = "Back";
+"onb.nav.finish" = "Get Started";
+"onb.nav.skip" = "Skip";
+
+// MARK: - Sidebar
+
+"sidebar.timer" = "Timer";
+"sidebar.insights" = "Insights";
+"sidebar.statistics" = "Statistics";
+"sidebar.settings" = "Settings";
+"sidebar.helpAbout" = "Help & About";
+"sidebar.tasks" = "Tasks";
+"sidebar.tasks.hint.click" = "Click to set as active task";
+"sidebar.tasks.hint.rightClick" = "Right-click for more options";
+"sidebar.tasks.addPlaceholder" = "Add task...";
+"sidebar.tasks.editPlaceholder" = "Edit task...";
+"sidebar.tasks.noTasks" = "No tasks yet";
+"sidebar.tasks.completed" = "Completed";
+"sidebar.tasks.clear" = "Clear";
+"sidebar.miniPlayer" = "Mini Player";
+"sidebar.tasks.setDueDate" = "Set Due Date";
+"sidebar.tasks.changeDueDate" = "Change Due Date";
+"sidebar.tasks.removeDueDate" = "Remove Due Date";
+"sidebar.tasks.edit" = "Edit";
+"sidebar.tasks.delete" = "Delete";
+
+// MARK: - Timer
+
+"timer.selectSession" = "Select Session";
+"timer.noTask" = "No Task";
+"timer.workingOn" = "Working on: %@";
+"timer.selectTask" = "Select Task";
+"timer.timeRemaining" = "Time Remaining";
+"timer.stop" = "Stop";
+"timer.pause" = "Pause";
+"timer.start" = "Start";
+"timer.skip" = "Skip";
+"timer.playZenMusic" = "Play Zen Music";
+"timer.nextTrack" = "Next track";
+"timer.mode.focus" = "FOCUS";
+"timer.mode.shortBreak" = "SHORT BREAK";
+"timer.mode.longBreak" = "LONG BREAK";
+
+// MARK: - Stats
+
+"stats.title" = "Statistics";
+"stats.subtitle" = "Track your productivity journey";
+"stats.today" = "Today";
+"stats.sessions" = "sessions";
+"stats.thisWeek" = "This Week";
+"stats.totalTime" = "Total Time";
+"stats.focused" = "focused";
+"stats.thisMonth" = "This Month";
+"stats.chartRange" = "Chart Range";
+"stats.week" = "Week";
+"stats.month" = "Month";
+"stats.sessionTypes" = "Session Types";
+"stats.insights" = "Insights";
+"stats.bestDay" = "Best Day";
+"stats.bestDayDesc" = "%@ with %d sessions";
+"stats.dailyAverage" = "Daily Average";
+"stats.dailyAverageDesc" = "%.1f sessions per day";
+"stats.currentStreak" = "Current Streak";
+"stats.currentStreakDesc" = "%d day(s) in a row (Best: %d)";
+"stats.completionRate" = "Completion Rate";
+"stats.avgSession" = "Avg Session";
+"stats.mostProductiveDay" = "Most Productive Day";
+"stats.noDataYet" = "No Data Yet";
+"stats.noDataDesc" = "Complete some focus sessions to see insights";
+"stats.achievements" = "Achievements";
+"stats.hoverForInfo" = "Hover for more info";
+"stats.unlockedCount" = "%d/%d Unlocked";
+"stats.unlocked" = "Unlocked!";
+
+// MARK: - Settings
+
+"settings.title" = "Settings";
+"settings.subtitle" = "Customize Tempo";
+"settings.timerSettings" = "Timer Settings";
+"settings.focusDuration" = "Focus Duration";
+"settings.shortBreak" = "Short Break";
+"settings.longBreak" = "Long Break";
+"settings.sessionPresets" = "Session Presets";
+"settings.addSession" = "Add Session";
+"settings.sessionName" = "Session Name";
+"settings.focus" = "Focus";
+"settings.deleteSession" = "Delete Session";
+"settings.color" = "Color";
+"settings.behavior" = "Behavior";
+"settings.autoStartBreaks" = "Auto-start breaks";
+"settings.autoStartFocus" = "Auto-start focus sessions";
+"settings.notificationsAndSounds" = "Notifications & Sounds";
+"settings.enableNotifications" = "Enable notifications";
+"settings.enableSounds" = "Enable sounds";
+"settings.enableZenMusic" = "Enable zen music during focus";
+"settings.theme" = "Theme";
+"settings.themeUses" = "This theme uses %@ mode";
+"settings.dark" = "dark";
+"settings.light" = "light";
+"settings.appearance" = "Appearance";
+"settings.appearanceMode" = "Appearance Mode";
+"settings.animationStyle" = "Animation Style";
+"settings.keepThemeColor" = "Keep theme color when switching sessions";
+"settings.accentColor" = "Accent Color";
+"settings.language" = "Language";
+"settings.appLanguage" = "App Language";
+"settings.languageNote" = "Language change will take effect across the entire app.";
+"settings.aiInsights" = "AI Insights";
+"settings.enableAIInsights" = "Enable AI Insights";
+"settings.postSessionFeedback" = "Post-session feedback prompt";
+"settings.currentLocation" = "Current Location";
+"settings.clearAIData" = "Clear AI Data";
+"settings.about" = "About";
+"settings.checkForUpdates" = "Check for Updates in App Store";
+"settings.resetAllData" = "Reset All Data";
+"settings.resetAllDataTitle" = "Reset All Data?";
+"settings.cancel" = "Cancel";
+"settings.reset" = "Reset";
+"settings.resetMessage" = "This will delete all your statistics and reset settings to defaults. This action cannot be undone.";
+"settings.checkForUpdatesTitle" = "Check for Updates";
+"settings.updateInAppStore" = "Update in App Store";
+"settings.later" = "Later";
+"settings.ok" = "OK";
+"settings.updateAvailable" = "Version %@ is available. You are currently using version %@.";
+"settings.updateFailed" = "Failed to check for updates: %@";
+"settings.upToDate" = "You are using the latest version.";
+"settings.deleteSessionTitle" = "Delete Session?";
+"settings.clearAIDataTitle" = "Clear AI Data?";
+"settings.clearAIDataMessage" = "This will delete all cached insights and AI analysis data. Your session history will not be affected.";
+
+// Theme names
+"theme.default" = "Default";
+"theme.darkNoir" = "Dark Noir";
+"theme.pastel" = "Pastel";
+"theme.neon" = "Neon";
+"theme.nature" = "Nature";
+
+// Appearance modes
+"appearance.system" = "System";
+"appearance.light" = "Light";
+"appearance.dark" = "Dark";
+
+// Animation styles
+"animation.smooth" = "Smooth";
+"animation.snappy" = "Snappy";
+"animation.gentle" = "Gentle";
+
+// Accent color names
+"color.red" = "Red";
+"color.blue" = "Blue";
+"color.green" = "Green";
+"color.orange" = "Orange";
+"color.purple" = "Purple";
+"color.pink" = "Pink";
+"color.teal" = "Teal";
+"color.indigo" = "Indigo";
+"color.yellow" = "Yellow";
+"color.mint" = "Mint";
+"color.cyan" = "Cyan";
+"color.brown" = "Brown";
+
+// MARK: - Help
+
+"help.tagline" = "A focus timer designed for students";
+"help.features" = "Features";
+"help.feature.timer.title" = "Focus Timer";
+"help.feature.timer.desc" = "Pomodoro sessions with focus, short break, and long break cycles";
+"help.feature.presets.title" = "Session Presets";
+"help.feature.presets.desc" = "Focus (25m), Deep Work (50m), Quick (15m), or create your own";
+"help.feature.zen.title" = "Zen Music";
+"help.feature.zen.desc" = "Ambient music that auto-plays during focus and pauses on breaks";
+"help.feature.todo.title" = "Todo List";
+"help.feature.todo.desc" = "Manage tasks with priorities, link them to sessions, and track progress";
+"help.feature.stats.title" = "Statistics";
+"help.feature.stats.desc" = "Daily, weekly, and monthly insights with streaks and session history";
+"help.feature.ai.title" = "AI Insights";
+"help.feature.ai.desc" = "On-device ML analyzes your sessions to provide even more personalized focus recommendations";
+"help.feature.achievements.title" = "Achievements";
+"help.feature.achievements.desc" = "12 unlockable milestones like Early Bird, Streak Master, and more";
+"help.feature.miniPlayer.title" = "Mini Player";
+"help.feature.miniPlayer.desc" = "Compact floating timer that stays on top across all spaces";
+"help.feature.themes.title" = "Themes & Colors";
+"help.feature.themes.desc" = "5 app themes, 12 accent colors, and 3 animation styles";
+"help.quickStart" = "Quick Start";
+"help.step1" = "Press Space to start a focus session";
+"help.step2" = "Work until the timer ends — a break starts automatically";
+"help.step3" = "Every 4 sessions, enjoy a longer break";
+"help.step4" = "Track your progress in Statistics and unlock Achievements";
+"help.shortcuts" = "Keyboard Shortcuts";
+"help.shortcut.space" = "Start / Pause timer";
+"help.shortcut.cmdR" = "Stop and reset";
+"help.shortcut.cmdS" = "Skip to next session";
+"help.shortcut.cmdM" = "Open Mini Player";
+"help.aiML" = "AI & Machine Learning";
+"help.ai.peak.title" = "Productivity Peak Detection";
+"help.ai.peak.desc" = "Identifies which hours and days you focus best based on your session history.";
+"help.ai.quality.title" = "Focus Quality Scoring";
+"help.ai.quality.desc" = "Scores each session using duration, completion, and time-of-day patterns to measure true focus quality.";
+"help.ai.suggest.title" = "Smart Session Suggestions";
+"help.ai.suggest.desc" = "Recommends an optimal session length based on your recent performance and patterns.";
+"help.ai.private.title" = "On-Device & Private";
+"help.ai.private.desc" = "All analysis runs locally on your Mac. No data ever leaves your device.";
+"help.credits" = "Credits";
+"help.credit.zenMusic" = "Zen Music";
+"help.credit.appIcon" = "App Icon";
+
+// MARK: - AI Insights View
+
+"insights.title" = "AI Insights";
+"insights.subtitle" = "Personalized productivity recommendations";
+"insights.productivityScore" = "Productivity Score";
+"insights.scoreDesc" = "Based on completion rate, consistency, and focus quality";
+"insights.recentQuality" = "Recent Focus Quality";
+"insights.avgQuality" = "Avg Quality";
+"insights.rating" = "Rating";
+"insights.avgPauses" = "Avg Pauses";
+"insights.noDataYet" = "Not Enough Data Yet";
+"insights.noDataDesc" = "Complete at least 10 focus sessions to unlock AI insights.";
+"insights.locked" = "AI Insights Locked";
+"insights.lockedDesc" = "Build up your focus history to unlock personalized insights";
+"insights.completedSessions" = "Completed Sessions";
+"insights.activeDays" = "Active Days";
+"insights.whatYouCanDo" = "What You Can Do";
+"insights.done" = "Done";
+"insights.actionRecommended" = "Action recommended";
+"insights.privacy.title" = "AI Insights Privacy";
+"insights.privacy.intro" = "Tempo's AI insights are powered by on-device analysis. Here's what you should know:";
+"insights.privacy.private.title" = "100% Private";
+"insights.privacy.private.desc" = "All analysis happens on your Mac. No data is sent to any server.";
+"insights.privacy.learning.title" = "Learning From You";
+"insights.privacy.learning.desc" = "AI learns your patterns to provide personalized recommendations.";
+"insights.privacy.control.title" = "You're In Control";
+"insights.privacy.control.desc" = "Opt out anytime and delete all AI data from Settings.";
+"insights.privacy.understand" = "I Understand";
+
+// MARK: - Achievements
+
+"achievement.first_focus.title" = "First Focus";
+"achievement.first_focus.desc" = "Complete your first focus session";
+"achievement.getting_started.title" = "Getting Started";
+"achievement.getting_started.desc" = "Complete 5 focus sessions";
+"achievement.dedicated.title" = "Dedicated";
+"achievement.dedicated.desc" = "Complete 25 focus sessions";
+"achievement.century.title" = "Century";
+"achievement.century.desc" = "Complete 100 focus sessions";
+"achievement.marathon.title" = "Marathon";
+"achievement.marathon.desc" = "Complete 500 focus sessions";
+"achievement.early_bird.title" = "Early Bird";
+"achievement.early_bird.desc" = "Complete 5 sessions before 9am";
+"achievement.night_owl.title" = "Night Owl";
+"achievement.night_owl.desc" = "Complete 5 sessions after 8pm";
+"achievement.streak_7.title" = "Week Warrior";
+"achievement.streak_7.desc" = "Maintain a 7-day streak";
+"achievement.streak_30.title" = "Streak Master";
+"achievement.streak_30.desc" = "Maintain a 30-day streak";
+"achievement.deep_diver.title" = "Deep Diver";
+"achievement.deep_diver.desc" = "Complete 5 Deep Work sessions";
+"achievement.focus_hour.title" = "Focus Hour";
+"achievement.focus_hour.desc" = "Accumulate 60 min of focus in a single day";
+"achievement.zen_master.title" = "Zen Master";
+"achievement.zen_master.desc" = "Complete 10 sessions with zen music";
+
+// MARK: - Common / Misc
+
+"common.min" = "min";
+"common.sessions" = "sessions";
+"common.days" = "days";
+
+// MARK: - InsightsEngine Generated Content
+
+// Focus quality rating labels
+"quality.excellent" = "Excellent";
+"quality.good" = "Good";
+"quality.fair" = "Fair";
+"quality.needsWork" = "Needs Work";
+"quality.poor" = "Poor";
+
+// Smart suggestion banner
+"suggestion.title" = "Great time to focus!";
+"suggestion.message" = "You complete %d%% of sessions at this hour. Try a %d-minute session.";
+"suggestion.actionLabel" = "Start %dm";
+
+// Insight: peak hour
+"insight.peakHour.title" = "Your Peak Hour";
+"insight.peakHour.message" = "You're most productive around %@. Schedule important work for this time.";
+
+// Insight: productivity score
+"insight.productivityMaster.title" = "Productivity Master";
+"insight.productivityMaster.message" = "Your productivity score is %d%% — outstanding consistency!";
+"insight.roomForGrowth.title" = "Room for Growth";
+"insight.roomForGrowth.message" = "Your productivity score is %d%%. Try reducing interruptions and keeping consistent session lengths.";
+
+// Insight: quality trend
+"insight.qualityImproving.title" = "Quality Improving";
+"insight.qualityImproving.message" = "Your focus quality has increased by %d%% recently. Keep it up!";
+"insight.qualityDeclining.title" = "Quality Declining";
+"insight.qualityDeclining.message" = "Your focus quality has dropped. Consider longer breaks or a change of environment.";
+
+// Insight: optimal session length
+"insight.optimalLength.title" = "Optimal Session Length";
+"insight.optimalLength.message" = "You complete %d-minute sessions most consistently. Consider this as your default.";
+
+// Insight: streaks
+"insight.strongStreak.title" = "Strong Streak!";
+"insight.strongStreak.message" = "You're at %d days! Just %d more to beat your record.";
+"insight.newRecord.title" = "New Record!";
+"insight.newRecord.message" = "You've set a new personal best streak of %d days!";
+
+// Insight: environment
+"insight.zenHelps.title" = "Zen Music Helps!";
+"insight.zenHelps.message" = "You focus %d%% longer with zen music enabled.";
+"insight.tryWithoutZen.title" = "Try Without Music";
+"insight.tryWithoutZen.message" = "You focus %d%% longer without zen music. Consider working in silence.";
+"insight.morningsCalmer.title" = "Mornings Are Calmer";
+"insight.morningsCalmer.message" = "You have fewer interruptions in the morning. Schedule deep work sessions before noon.";
+
+// InsightType action suggestions
+"insight.action.productivityPeak" = "Schedule your most important tasks during your peak hours.";
+"insight.action.recommendation" = "Try this for a week and track the results.";
+"insight.action.achievement" = "Keep up the momentum!";
+"insight.action.warning" = "Consider taking a longer break or changing your environment.";
+"insight.action.trend" = "You're on the right track — keep it up!";
+"insight.action.motivation" = "Complete one session today to maintain your streak.";
+"insight.action.improvement" = "Focus on reducing one source of distraction at a time.";

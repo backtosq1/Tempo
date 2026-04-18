@@ -1,0 +1,356 @@
+// =============================================
+// Tempo - 简体中文本地化字符串
+// =============================================
+
+// MARK: - 引导页
+
+// 语言选择
+"onb.lang.subtitle" = "选择语言";
+"onb.lang.continue" = "继续";
+
+// 第1页 - 欢迎
+"onb.p1.title" = "欢迎使用 Tempo";
+"onb.p1.body" = "专为学生的深度专注与习惯养成设计的番茄钟应用。";
+
+// 第2页 - 自定义方案
+"onb.p2.title" = "自定义专注方案";
+"onb.p2.body" = "选择内置预设（深度工作、快速冲刺），或完全自定义时长与颜色。";
+
+// 第3页 - 禅乐
+"onb.p3.title" = "禅乐助你专注";
+"onb.p3.body" = "开启内置氛围音乐（Inner Piece、Zen Moods、Zen Garden），打造无干扰的专注氛围。";
+
+// 第4页 - 智能洞察
+"onb.p4.title" = "了解你的智能洞察";
+"onb.p4.body" = "完成 10 次专注后，Tempo 分析你的规律——黄金专注时段、连续打卡动力、专注质量——并提供可执行建议。所有处理均在本地完成。";
+
+// 第5页 - 成就
+"onb.p5.title" = "解锁成就";
+"onb.p5.body" = "从「初次专注」到「禅定大师」和「周卡战士」——里程碑见证你的坚持，激励你继续前行。";
+
+// 导航
+"onb.nav.next" = "下一步";
+"onb.nav.back" = "返回";
+"onb.nav.finish" = "开始使用";
+"onb.nav.skip" = "跳过";
+
+// MARK: - 侧边栏
+
+"sidebar.timer" = "计时器";
+"sidebar.insights" = "AI分析";
+"sidebar.statistics" = "统计";
+"sidebar.settings" = "设置";
+"sidebar.helpAbout" = "帮助与关于";
+"sidebar.tasks" = "任务";
+"sidebar.tasks.hint.click" = "点击设为当前任务";
+"sidebar.tasks.hint.rightClick" = "右键查看更多选项";
+"sidebar.tasks.addPlaceholder" = "添加任务...";
+"sidebar.tasks.editPlaceholder" = "编辑任务...";
+"sidebar.tasks.noTasks" = "暂无任务";
+"sidebar.tasks.completed" = "已完成";
+"sidebar.tasks.clear" = "清除";
+"sidebar.miniPlayer" = "迷你播放器";
+"sidebar.tasks.setDueDate" = "设置截止日期";
+"sidebar.tasks.changeDueDate" = "更改截止日期";
+"sidebar.tasks.removeDueDate" = "移除截止日期";
+"sidebar.tasks.edit" = "编辑";
+"sidebar.tasks.delete" = "删除";
+
+// MARK: - 计时器
+
+"timer.selectSession" = "选择方案";
+"timer.noTask" = "无任务";
+"timer.workingOn" = "正在进行：%@";
+"timer.selectTask" = "选择任务";
+"timer.timeRemaining" = "剩余时间";
+"timer.stop" = "停止";
+"timer.pause" = "暂停";
+"timer.start" = "开始";
+"timer.skip" = "跳过";
+"timer.playZenMusic" = "播放氛围音乐";
+"timer.nextTrack" = "下一首";
+"timer.mode.focus" = "专注";
+"timer.mode.shortBreak" = "短休息";
+"timer.mode.longBreak" = "长休息";
+
+// MARK: - 统计
+
+"stats.title" = "统计";
+"stats.subtitle" = "记录你的专注旅程";
+"stats.today" = "今天";
+"stats.sessions" = "次专注";
+"stats.thisWeek" = "本周";
+"stats.totalTime" = "总时长";
+"stats.focused" = "已专注";
+"stats.thisMonth" = "本月";
+"stats.chartRange" = "图表范围";
+"stats.week" = "周";
+"stats.month" = "月";
+"stats.sessionTypes" = "专注类型";
+"stats.insights" = "AI分析";
+"stats.bestDay" = "最佳日";
+"stats.bestDayDesc" = "%@，%d 次专注";
+"stats.dailyAverage" = "日均";
+"stats.dailyAverageDesc" = "每天 %.1f 次专注";
+"stats.currentStreak" = "当前连胜";
+"stats.currentStreakDesc" = "连续 %d 天（最佳：%d）";
+"stats.completionRate" = "完成率";
+"stats.avgSession" = "平均时长";
+"stats.mostProductiveDay" = "最高效日";
+"stats.noDataYet" = "暂无数据";
+"stats.noDataDesc" = "完成一些专注来查看AI分析";
+"stats.achievements" = "成就";
+"stats.hoverForInfo" = "悬停查看详情";
+"stats.unlockedCount" = "%d/%d 已解锁";
+"stats.unlocked" = "已解锁！";
+
+// MARK: - 设置
+
+"settings.title" = "设置";
+"settings.subtitle" = "自定义 Tempo";
+"settings.timerSettings" = "计时器设置";
+"settings.focusDuration" = "专注时长";
+"settings.shortBreak" = "短休息";
+"settings.longBreak" = "长休息";
+"settings.sessionPresets" = "专注模式预设";
+"settings.addSession" = "添加自定义模式";
+"settings.sessionName" = "自定义模式名称";
+"settings.focus" = "专注";
+"settings.deleteSession" = "删除自定义模式";
+"settings.color" = "颜色";
+"settings.behavior" = "自动";
+"settings.autoStartBreaks" = "自动开始休息";
+"settings.autoStartFocus" = "自动开始专注";
+"settings.notificationsAndSounds" = "通知与声音";
+"settings.enableNotifications" = "开启通知";
+"settings.enableSounds" = "开启声音";
+"settings.enableZenMusic" = "专注时启用氛围音乐";
+"settings.theme" = "主题";
+"settings.themeUses" = "此主题使用%@模式";
+"settings.dark" = "深色";
+"settings.light" = "浅色";
+"settings.appearance" = "外观";
+"settings.appearanceMode" = "外观模式";
+"settings.animationStyle" = "风格";
+"settings.keepThemeColor" = "切换方案时保持主题颜色";
+"settings.accentColor" = "强调色";
+"settings.language" = "语言";
+"settings.appLanguage" = "应用语言";
+"settings.languageNote" = "语言更改将在整个应用中生效。";
+"settings.aiInsights" = "AI分析";
+"settings.enableAIInsights" = "启用AI分析";
+"settings.postSessionFeedback" = "专注后显示反馈";
+"settings.currentLocation" = "当前位置";
+"settings.clearAIData" = "清除AI数据";
+"settings.about" = "关于";
+"settings.checkForUpdates" = "在 App Store 检查更新";
+"settings.resetAllData" = "重置所有数据";
+"settings.resetAllDataTitle" = "重置所有数据？";
+"settings.cancel" = "取消";
+"settings.reset" = "重置";
+"settings.resetMessage" = "这将删除所有统计数据并恢复所有设置。此操作无法撤销。";
+"settings.checkForUpdatesTitle" = "检查更新";
+"settings.updateInAppStore" = "前往 App Store 更新";
+"settings.later" = "稍后";
+"settings.ok" = "好";
+"settings.updateAvailable" = "版本 %@ 可用。你当前使用的是版本 %@。";
+"settings.updateFailed" = "检查更新失败：%@";
+"settings.upToDate" = "你正在使用最新版本。";
+"settings.deleteSessionTitle" = "删除自定义模式？";
+"settings.clearAIDataTitle" = "清除AI数据？";
+"settings.clearAIDataMessage" = "这将删除所有AI分析的数据和缓存。你的专注历史记录不会受到影响。";
+
+// 主题名称
+"theme.default" = "默认";
+"theme.darkNoir" = "暗黑";
+"theme.pastel" = "柔彩";
+"theme.neon" = "霓虹";
+"theme.nature" = "自然";
+
+// 外观模式
+"appearance.system" = "跟随系统";
+"appearance.light" = "浅色";
+"appearance.dark" = "深色";
+
+// 动画风格
+"animation.smooth" = "流畅";
+"animation.snappy" = "灵敏";
+"animation.gentle" = "柔和";
+
+// 强调色名称
+"color.red" = "红色";
+"color.blue" = "蓝色";
+"color.green" = "绿色";
+"color.orange" = "橙色";
+"color.purple" = "紫色";
+"color.pink" = "粉色";
+"color.teal" = "青色";
+"color.indigo" = "靛蓝";
+"color.yellow" = "黄色";
+"color.mint" = "薄荷";
+"color.cyan" = "天蓝";
+"color.brown" = "棕色";
+
+// MARK: - 帮助
+
+"help.tagline" = "专为学生设计的专注计时器";
+"help.features" = "功能";
+"help.feature.timer.title" = "专注计时";
+"help.feature.timer.desc" = "番茄钟模式：专注、短休息和长休息循环";
+"help.feature.presets.title" = "自定义模式预设";
+"help.feature.presets.desc" = "专注（25分钟）、深度工作（50分钟）、快速（15分钟），或创建自定义模式";
+"help.feature.zen.title" = "氛围音乐";
+"help.feature.zen.desc" = "专注时自动播放环境音乐，休息时自动暂停";
+"help.feature.todo.title" = "任务清单";
+"help.feature.todo.desc" = "管理带优先级的任务，关联到专注，追踪进度";
+"help.feature.stats.title" = "统计数据";
+"help.feature.stats.desc" = "每日、每周和每月洞察，包含连续记录和历史";
+"help.feature.ai.title" = "AI分析";
+"help.feature.ai.desc" = "本地 ML 分析你的专注数据，提供更个性化的专注建议";
+"help.feature.achievements.title" = "成就系统";
+"help.feature.achievements.desc" = "12 个可解锁里程碑，包括早起鸟、连续大师等";
+"help.feature.miniPlayer.title" = "迷你播放器";
+"help.feature.miniPlayer.desc" = "紧凑的浮动计时器，始终保持在所有窗口之上";
+"help.feature.themes.title" = "主题与颜色";
+"help.feature.themes.desc" = "5 种主题、12 种强调色和 3 种动画风格";
+"help.quickStart" = "快速上手";
+"help.step1" = "按空格键开始专注";
+"help.step2" = "计时结束后自动开始休息";
+"help.step3" = "每 4 次专注后享受长休息";
+"help.step4" = "在统计中追踪进度，解锁成就";
+"help.shortcuts" = "键盘快捷键";
+"help.shortcut.space" = "开始 / 暂停计时";
+"help.shortcut.cmdR" = "停止并重置";
+"help.shortcut.cmdS" = "跳到下一个阶段";
+"help.shortcut.cmdM" = "打开迷你播放器";
+"help.aiML" = "AI与ML";
+"help.ai.peak.title" = "高效时段检测";
+"help.ai.peak.desc" = "根据你的专注历史，识别你最高效的时间段和日期。";
+"help.ai.quality.title" = "专注质量评分";
+"help.ai.quality.desc" = "基于时长、完成度和时段模式为每次专注评分，衡量真实专注质量。";
+"help.ai.suggest.title" = "智能方案推荐";
+"help.ai.suggest.desc" = "根据你的近期表现和模式，推荐最佳专注时长。";
+"help.ai.private.title" = "本地且保证隐私";
+"help.ai.private.desc" = "所有分析在你的 Mac 本地运行，数据绝不离开设备。";
+"help.credits" = "致谢";
+"help.credit.zenMusic" = "氛围音乐";
+"help.credit.appIcon" = "应用图标";
+
+// MARK: - AI分析视图
+
+"insights.title" = "AI分析";
+"insights.subtitle" = "个性化的专注建议";
+"insights.productivityScore" = "综合评分";
+"insights.scoreDesc" = "基于完成率、一致性和专注质量";
+"insights.recentQuality" = "近期专注质量";
+"insights.avgQuality" = "平均质量";
+"insights.rating" = "评级";
+"insights.avgPauses" = "平均暂停";
+"insights.noDataYet" = "数据不足";
+"insights.noDataDesc" = "完成至少 10 次专注以解锁 AI 洞察。";
+"insights.locked" = "AI分析已锁定";
+"insights.lockedDesc" = "积累更多专注记录以解锁个性化洞察";
+"insights.completedSessions" = "已完成专注";
+"insights.activeDays" = "活跃天数";
+"insights.whatYouCanDo" = "你可以";
+"insights.done" = "完成";
+"insights.actionRecommended" = "建议";
+"insights.privacy.title" = "AI分析隐私";
+"insights.privacy.intro" = "Tempo的AI分析完全基于本地分析：";
+"insights.privacy.private.title" = "100% 私密";
+"insights.privacy.private.desc" = "所有分析在你的 Mac 上完成，不会向任何服务器发送数据。";
+"insights.privacy.learning.title" = "从你的习惯中学习";
+"insights.privacy.learning.desc" = "AI学习你的模式，提供个性化建议。";
+"insights.privacy.control.title" = "完全由你掌控";
+"insights.privacy.control.desc" = "随时可以关闭，并在设置中删除所有AI数据。";
+"insights.privacy.understand" = "我知道了";
+
+// MARK: - 成就
+
+"achievement.first_focus.title" = "初次专注";
+"achievement.first_focus.desc" = "完成你的第一次专注";
+"achievement.getting_started.title" = "初露锋芒";
+"achievement.getting_started.desc" = "完成 5 次专注";
+"achievement.dedicated.title" = "持之以恒";
+"achievement.dedicated.desc" = "完成 25 次专注";
+"achievement.century.title" = "百次里程碑";
+"achievement.century.desc" = "完成 100 次专注";
+"achievement.marathon.title" = "马拉松选手";
+"achievement.marathon.desc" = "完成 500 次专注";
+"achievement.early_bird.title" = "早起鸟";
+"achievement.early_bird.desc" = "在早上 9 点前完成 5 次专注";
+"achievement.night_owl.title" = "夜猫子";
+"achievement.night_owl.desc" = "在晚上 8 点后完成 5 次专注";
+"achievement.streak_7.title" = "周卡战士";
+"achievement.streak_7.desc" = "保持 7 天连续专注";
+"achievement.streak_30.title" = "连续大师";
+"achievement.streak_30.desc" = "保持 30 天连续专注";
+"achievement.deep_diver.title" = "怒海潜将";
+"achievement.deep_diver.desc" = "完成 5 次深度工作";
+"achievement.focus_hour.title" = "专注一小时";
+"achievement.focus_hour.desc" = "单日累计专注 60 分钟";
+"achievement.zen_master.title" = "禅定大师";
+"achievement.zen_master.desc" = "在氛围音乐陪伴随下完成 10 次专注";
+
+// MARK: - 通用
+
+"common.min" = "分钟";
+"common.sessions" = "次专注";
+"common.days" = "天";
+
+// MARK: - AI洞察引擎生成内容
+
+// 专注质量评级
+"quality.excellent" = "优秀";
+"quality.good" = "良好";
+"quality.fair" = "一般";
+"quality.needsWork" = "待改善";
+"quality.poor" = "较差";
+
+// 智能建议横幅
+"suggestion.title" = "现在是专注的好时机！";
+"suggestion.message" = "你在这个时间段有 %d%% 的完成率。试试 %d 分钟专注？";
+"suggestion.actionLabel" = "开始 %d 分钟";
+
+// 洞察：高效时段
+"insight.peakHour.title" = "你的高效时段";
+"insight.peakHour.message" = "你在 %@ 前后最高效。把重要工作安排在这个时间段。";
+
+// 洞察：生产力评分
+"insight.productivityMaster.title" = "专注达人";
+"insight.productivityMaster.message" = "你的综合评分为 %d%%——保持稳定，表现出色！";
+"insight.roomForGrowth.title" = "还有提升空间";
+"insight.roomForGrowth.message" = "你的综合评分为 %d%%。试着减少干扰，保持稳定的专注时长。";
+
+// 洞察：质量趋势
+"insight.qualityImproving.title" = "质量提升中";
+"insight.qualityImproving.message" = "你的专注质量近期提升了 %d%%，继续保持！";
+"insight.qualityDeclining.title" = "质量有所下降";
+"insight.qualityDeclining.message" = "你的专注质量有所下降。考虑延长休息时间或换个环境。";
+
+// 洞察：最佳时长
+"insight.optimalLength.title" = "最佳专注时长";
+"insight.optimalLength.message" = "你完成 %d 分钟专注的概率最高，可以将其设为默认时长。";
+
+// 洞察：连续记录
+"insight.strongStreak.title" = "连胜强劲！";
+"insight.strongStreak.message" = "已连续 %d 天！再坚持 %d 天就能打破你的记录。";
+"insight.newRecord.title" = "新纪录！";
+"insight.newRecord.message" = "你创下了 %d 天的个人最长连续记录！";
+
+// 洞察：环境因素
+"insight.zenHelps.title" = "氛围音乐有效！";
+"insight.zenHelps.message" = "开启氛围音乐后，你的专注时长提升了 %d%%。";
+"insight.tryWithoutZen.title" = "试试无音乐模式";
+"insight.tryWithoutZen.message" = "关闭氛围音乐后，你的专注时长提升了 %d%%。可以尝试在安静中工作。";
+"insight.morningsCalmer.title" = "上午干扰更少";
+"insight.morningsCalmer.message" = "你在上午的干扰次数更少。建议将深度工作安排在中午之前。";
+
+// 洞察类型行动建议
+"insight.action.productivityPeak" = "将最重要的任务安排在你的高效时段。";
+"insight.action.recommendation" = "坚持一周，记录效果。";
+"insight.action.achievement" = "保持势头！";
+"insight.action.warning" = "考虑延长休息时间或换个环境。";
+"insight.action.trend" = "你走在正确的轨道上——继续保持！";
+"insight.action.motivation" = "今天完成一次专注，保持连续记录。";
+"insight.action.improvement" = "每次专注于减少一个干扰来源。";

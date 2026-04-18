@@ -10,12 +10,17 @@ struct TempoApp: App {
     @StateObject private var timerManager = TimerManager()
     @AppStorage(SettingsKeys.Appearance.appAppearance.rawValue) private var appAppearance = "system"
     @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme = "default"
+    @AppStorage(SettingsKeys.Onboarding.hasCompletedOnboarding.rawValue) private var hasCompletedOnboarding = false
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(timerManager)
                 .frame(minWidth: 650, minHeight: 750)
+                .sheet(isPresented: .constant(!hasCompletedOnboarding)) {
+                    OnboardingView()
+                        .interactiveDismissDisabled(true)
+                }
                 .onAppear {
                     setupKeyMonitors()
                     setupNotificationObservers()

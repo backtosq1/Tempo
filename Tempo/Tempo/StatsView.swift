@@ -7,6 +7,7 @@ import Charts
 struct StatsView: View {
     @ObservedObject var timerManager: TimerManager
     @StateObject private var achievementManager = AchievementManager.shared
+    @ObservedObject private var locManager = LocalizationManager.shared
 
     // MARK: - State
     @State private var showMonthChart = false
@@ -153,11 +154,11 @@ struct StatsView: View {
     // MARK: - View Sections
     private var headerSection: some View {
         VStack(spacing: 8) {
-            Text("Statistics")
+            Text(L("stats.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(theme.textPrimary)
-            Text("Track your productivity journey")
+            Text(L("stats.subtitle"))
                 .font(.subheadline)
                 .foregroundColor(theme.textSecondary)
         }
@@ -170,9 +171,9 @@ struct StatsView: View {
             GridItem(.flexible())
         ], spacing: 20) {
             StatCard(
-                title: "Today",
+                title: L("stats.today"),
                 value: "\(timerManager.todaySessionsCount)",
-                subtitle: "sessions",
+                subtitle: L("stats.sessions"),
                 icon: "flame.fill",
                 color: accentColor,
                 animationDelay: 0.1,
@@ -180,9 +181,9 @@ struct StatsView: View {
             )
 
             StatCard(
-                title: "This Week",
+                title: L("stats.thisWeek"),
                 value: "\(totalSessionsThisWeek)",
-                subtitle: "sessions",
+                subtitle: L("stats.sessions"),
                 icon: "calendar",
                 color: accentColor,
                 animationDelay: 0.2,
@@ -190,9 +191,9 @@ struct StatsView: View {
             )
 
             StatCard(
-                title: "Total Time",
+                title: L("stats.totalTime"),
                 value: totalTimeString,
-                subtitle: "focused",
+                subtitle: L("stats.focused"),
                 icon: "clock.fill",
                 color: accentColor,
                 animationDelay: 0.3,
@@ -200,9 +201,9 @@ struct StatsView: View {
             )
 
             StatCard(
-                title: "This Month",
+                title: L("stats.thisMonth"),
                 value: monthHoursString,
-                subtitle: "focused",
+                subtitle: L("stats.focused"),
                 icon: "calendar.badge.clock",
                 color: accentColor,
                 animationDelay: 0.4,
@@ -215,13 +216,13 @@ struct StatsView: View {
     private var chartSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Segmented picker for Week/Month
-            Picker("Chart Range", selection: $showMonthChart) {
-                Text("Week").tag(false)
-                Text("Month").tag(true)
+            Picker(L("stats.chartRange"), selection: $showMonthChart) {
+                Text(L("stats.week")).tag(false)
+                Text(L("stats.month")).tag(true)
             }
             .pickerStyle(.segmented)
 
-            Text(showMonthChart ? "This Month" : "This Week")
+            Text(showMonthChart ? L("stats.thisMonth") : L("stats.thisWeek"))
                 .font(.headline)
                 .foregroundColor(theme.textPrimary)
 
@@ -253,7 +254,7 @@ struct StatsView: View {
     // MARK: - Session Type Breakdown
     private var sessionTypeSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Session Types")
+            Text(L("stats.sessionTypes"))
                 .font(.headline)
                 .foregroundColor(theme.textPrimary)
 
@@ -297,7 +298,7 @@ struct StatsView: View {
     // MARK: - Insights
     private var insightsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Insights")
+            Text(L("stats.insights"))
                 .font(.headline)
                 .foregroundColor(theme.textPrimary)
 
@@ -305,8 +306,8 @@ struct StatsView: View {
                 // 1. Best day insight
                 if let bestDay = weeklyData.max(by: { $0.sessions < $1.sessions }) {
                     InsightCard(
-                        title: "Best Day",
-                        description: "\(bestDay.dayOfWeek) with \(bestDay.sessions) sessions",
+                        title: L("stats.bestDay"),
+                        description: LF("stats.bestDayDesc", bestDay.dayOfWeek, bestDay.sessions),
                         icon: "trophy.fill",
                         color: .yellow,
                         themeColors: theme,
@@ -317,8 +318,8 @@ struct StatsView: View {
                 // 2. Daily average insight
                 let averageSessions = weeklyData.isEmpty ? 0 : Double(totalSessionsThisWeek) / Double(weeklyData.count)
                 InsightCard(
-                    title: "Daily Average",
-                    description: String(format: "%.1f sessions per day", averageSessions),
+                    title: L("stats.dailyAverage"),
+                    description: LF("stats.dailyAverageDesc", averageSessions),
                     icon: "chart.line.uptrend.xyaxis",
                     color: .green,
                     themeColors: theme,
@@ -329,8 +330,8 @@ struct StatsView: View {
                 let currentStreak = timerManager.calculateCurrentStreak()
                 let bestStreak = SettingsStore.shared.bestStreakEver
                 InsightCard(
-                    title: "Current Streak",
-                    description: "\(currentStreak) day\(currentStreak == 1 ? "" : "s") in a row (Best: \(bestStreak))",
+                    title: L("stats.currentStreak"),
+                    description: LF("stats.currentStreakDesc", currentStreak, bestStreak),
                     icon: "bolt.fill",
                     color: .orange,
                     themeColors: theme,
@@ -339,7 +340,7 @@ struct StatsView: View {
 
                 // 4. Completion Rate
                 InsightCard(
-                    title: "Completion Rate",
+                    title: L("stats.completionRate"),
                     description: completionRate,
                     icon: "checkmark.circle.fill",
                     color: .blue,
@@ -349,7 +350,7 @@ struct StatsView: View {
 
                 // 5. Average Session
                 InsightCard(
-                    title: "Avg Session",
+                    title: L("stats.avgSession"),
                     description: avgSessionMinutes,
                     icon: "timer",
                     color: .purple,
@@ -359,7 +360,7 @@ struct StatsView: View {
 
                 // 6. Most Productive Day
                 InsightCard(
-                    title: "Most Productive Day",
+                    title: L("stats.mostProductiveDay"),
                     description: mostProductiveDay,
                     icon: "star.fill",
                     color: .mint,
@@ -368,8 +369,8 @@ struct StatsView: View {
                 )
             } else {
                 InsightCard(
-                    title: "No Data Yet",
-                    description: "Complete some focus sessions to see insights",
+                    title: L("stats.noDataYet"),
+                    description: L("stats.noDataDesc"),
                     icon: "chart.bar.doc.horizontal",
                     color: .gray,
                     themeColors: theme
@@ -387,15 +388,15 @@ struct StatsView: View {
     private var achievementsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Achievements")
+                Text(L("stats.achievements"))
                     .font(.headline)
                     .foregroundColor(theme.textPrimary)
                 Spacer()
-                Text("Hover for more info")
+                Text(L("stats.hoverForInfo"))
                     .font(.subheadline)
                     .foregroundColor(theme.textSecondary)
                 Spacer()
-                Text("\(achievementManager.unlockedCount)/\(achievementManager.achievements.count) Unlocked")
+                Text(LF("stats.unlockedCount", achievementManager.unlockedCount, achievementManager.achievements.count))
                     .font(.subheadline)
                     .foregroundColor(theme.textSecondary)
             }

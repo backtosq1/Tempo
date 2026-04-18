@@ -42,20 +42,13 @@ enum InsightType: String, Codable {
 
     var actionSuggestion: String {
         switch self {
-        case .productivityPeak:
-            return "Schedule your most important tasks during your peak hours."
-        case .recommendation:
-            return "Try this for a week and track the results."
-        case .achievement:
-            return "Keep up the momentum!"
-        case .warning:
-            return "Consider taking a longer break or changing your environment."
-        case .trend:
-            return "You're on the right track — keep it up!"
-        case .motivation:
-            return "Complete one session today to maintain your streak."
-        case .improvement:
-            return "Focus on reducing one source of distraction at a time."
+        case .productivityPeak: return L("insight.action.productivityPeak")
+        case .recommendation:  return L("insight.action.recommendation")
+        case .achievement:     return L("insight.action.achievement")
+        case .warning:         return L("insight.action.warning")
+        case .trend:           return L("insight.action.trend")
+        case .motivation:      return L("insight.action.motivation")
+        case .improvement:     return L("insight.action.improvement")
         }
     }
 }
@@ -112,11 +105,11 @@ struct FocusQualityModel {
 
     static func ratingLabel(for score: Double) -> String {
         switch score {
-        case 0.9...1.0: return "Excellent"
-        case 0.75..<0.9: return "Good"
-        case 0.6..<0.75: return "Fair"
-        case 0.4..<0.6: return "Needs Work"
-        default: return "Poor"
+        case 0.9...1.0:    return L("quality.excellent")
+        case 0.75..<0.9:   return L("quality.good")
+        case 0.6..<0.75:   return L("quality.fair")
+        case 0.4..<0.6:    return L("quality.needsWork")
+        default:           return L("quality.poor")
         }
     }
 }
@@ -290,9 +283,9 @@ final class InsightsEngine: ObservableObject {
         let bestBucket = buckets.max(by: { $0.value.count < $1.value.count })?.key ?? 25
 
         return SmartSuggestion(
-            title: "Great time to focus!",
-            message: "You complete \(Int(hourRate * 100))% of sessions at this hour. Try a \(bestBucket)-minute session.",
-            actionLabel: "Start \(bestBucket)m",
+            title: L("suggestion.title"),
+            message: LF("suggestion.message", Int(hourRate * 100), bestBucket),
+            actionLabel: LF("suggestion.actionLabel", bestBucket),
             recommendedDuration: bestBucket,
             confidence: hourRate
         )
@@ -313,8 +306,8 @@ final class InsightsEngine: ObservableObject {
             insights.append(Insight(
                 id: UUID(),
                 type: .productivityPeak,
-                title: "Your Peak Hour",
-                message: "You're most productive around \(hourStr). Schedule important work for this time.",
+                title: L("insight.peakHour.title"),
+                message: LF("insight.peakHour.message", hourStr),
                 priority: 5,
                 actionable: true,
                 generatedAt: Date()
@@ -327,8 +320,8 @@ final class InsightsEngine: ObservableObject {
             insights.append(Insight(
                 id: UUID(),
                 type: .achievement,
-                title: "Productivity Master",
-                message: "Your productivity score is \(scorePercent)% — outstanding consistency!",
+                title: L("insight.productivityMaster.title"),
+                message: LF("insight.productivityMaster.message", scorePercent),
                 priority: 4,
                 actionable: false,
                 generatedAt: Date()
@@ -337,8 +330,8 @@ final class InsightsEngine: ObservableObject {
             insights.append(Insight(
                 id: UUID(),
                 type: .improvement,
-                title: "Room for Growth",
-                message: "Your productivity score is \(scorePercent)%. Try reducing interruptions and keeping consistent session lengths.",
+                title: L("insight.roomForGrowth.title"),
+                message: LF("insight.roomForGrowth.message", scorePercent),
                 priority: 5,
                 actionable: true,
                 generatedAt: Date()
@@ -360,8 +353,8 @@ final class InsightsEngine: ObservableObject {
             return [Insight(
                 id: UUID(),
                 type: .trend,
-                title: "Quality Improving",
-                message: "Your focus quality has increased by \(Int(trend * 100))% recently. Keep it up!",
+                title: L("insight.qualityImproving.title"),
+                message: LF("insight.qualityImproving.message", Int(trend * 100)),
                 priority: 4,
                 actionable: false,
                 generatedAt: Date()
@@ -370,8 +363,8 @@ final class InsightsEngine: ObservableObject {
             return [Insight(
                 id: UUID(),
                 type: .warning,
-                title: "Quality Declining",
-                message: "Your focus quality has dropped. Consider longer breaks or a change of environment.",
+                title: L("insight.qualityDeclining.title"),
+                message: L("insight.qualityDeclining.message"),
                 priority: 5,
                 actionable: true,
                 generatedAt: Date()
@@ -391,8 +384,8 @@ final class InsightsEngine: ObservableObject {
         return [Insight(
             id: UUID(),
             type: .recommendation,
-            title: "Optimal Session Length",
-            message: "You complete \(bestDuration)-minute sessions most consistently. Consider this as your default.",
+            title: L("insight.optimalLength.title"),
+            message: LF("insight.optimalLength.message", bestDuration),
             priority: 4,
             actionable: true,
             generatedAt: Date()
@@ -407,8 +400,8 @@ final class InsightsEngine: ObservableObject {
             return [Insight(
                 id: UUID(),
                 type: .motivation,
-                title: "Strong Streak!",
-                message: "You're at \(currentStreak) days! Just \(bestStreak - currentStreak) more to beat your record.",
+                title: L("insight.strongStreak.title"),
+                message: LF("insight.strongStreak.message", currentStreak, bestStreak - currentStreak),
                 priority: 3,
                 actionable: false,
                 generatedAt: Date()
@@ -417,8 +410,8 @@ final class InsightsEngine: ObservableObject {
             return [Insight(
                 id: UUID(),
                 type: .achievement,
-                title: "New Record!",
-                message: "You've set a new personal best streak of \(currentStreak) days!",
+                title: L("insight.newRecord.title"),
+                message: LF("insight.newRecord.message", currentStreak),
                 priority: 5,
                 actionable: false,
                 generatedAt: Date()
@@ -443,8 +436,8 @@ final class InsightsEngine: ObservableObject {
                 insights.append(Insight(
                     id: UUID(),
                     type: .recommendation,
-                    title: "Zen Music Helps!",
-                    message: "You focus \(Int(improvement))% longer with zen music enabled.",
+                    title: L("insight.zenHelps.title"),
+                    message: LF("insight.zenHelps.message", Int(improvement)),
                     priority: 4,
                     actionable: true,
                     generatedAt: Date()
@@ -453,8 +446,8 @@ final class InsightsEngine: ObservableObject {
                 insights.append(Insight(
                     id: UUID(),
                     type: .recommendation,
-                    title: "Try Without Music",
-                    message: "You focus \(Int(-improvement))% longer without zen music. Consider working in silence.",
+                    title: L("insight.tryWithoutZen.title"),
+                    message: LF("insight.tryWithoutZen.message", Int(-improvement)),
                     priority: 4,
                     actionable: true,
                     generatedAt: Date()
@@ -480,8 +473,8 @@ final class InsightsEngine: ObservableObject {
                 insights.append(Insight(
                     id: UUID(),
                     type: .recommendation,
-                    title: "Mornings Are Calmer",
-                    message: "You have fewer interruptions in the morning. Schedule deep work sessions before noon.",
+                    title: L("insight.morningsCalmer.title"),
+                    message: L("insight.morningsCalmer.message"),
                     priority: 3,
                     actionable: true,
                     generatedAt: Date()

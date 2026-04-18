@@ -45,6 +45,11 @@ enum SettingsKeys {
     enum Persistence: String, CaseIterable {
         case savedTimerState
     }
+    
+    enum Onboarding: String, CaseIterable {
+        case hasCompletedOnboarding
+        case appLanguage
+    }
 }
 
 // MARK: - Settings Store
@@ -565,11 +570,11 @@ enum AppTheme: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .default: return "Default"
-        case .darkNoir: return "Dark Noir"
-        case .pastel: return "Pastel"
-        case .neon: return "Neon"
-        case .nature: return "Nature"
+        case .default: return L("theme.default")
+        case .darkNoir: return L("theme.darkNoir")
+        case .pastel: return L("theme.pastel")
+        case .neon: return L("theme.neon")
+        case .nature: return L("theme.nature")
         }
     }
 
@@ -658,9 +663,9 @@ enum AppAppearance: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
+        case .system: return L("appearance.system")
+        case .light: return L("appearance.light")
+        case .dark: return L("appearance.dark")
         }
     }
 }
@@ -695,9 +700,9 @@ enum AnimationStyle: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .smooth: return "Smooth"
-        case .snappy: return "Snappy"
-        case .gentle: return "Gentle"
+        case .smooth: return L("animation.smooth")
+        case .snappy: return L("animation.snappy")
+        case .gentle: return L("animation.gentle")
         }
     }
 }

@@ -13,6 +13,7 @@ struct SidebarView: View {
     // @AppStorage for reactive theme color updates
     @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColorValue: String = "red"
     @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme: String = "default"
+    @ObservedObject private var locManager = LocalizationManager.shared
     
     @State private var todos: [TodoItem] = []
     @State private var newTodoTitle: String = ""
@@ -211,7 +212,7 @@ struct SidebarView: View {
     private var navigationItems: some View {
         VStack(spacing: 4) {
             SidebarItem(
-                title: "Timer",
+                title: L("sidebar.timer"),
                 icon: "timer",
                 isSelected: selectedTab == 0,
                 accentColor: accentColor,
@@ -221,7 +222,7 @@ struct SidebarView: View {
             .onTapGesture { selectTab(0) }
 
             SidebarItem(
-                title: "Insights",
+                title: L("sidebar.insights"),
                 icon: "brain.head.profile",
                 isSelected: selectedTab == 1,
                 accentColor: accentColor,
@@ -231,7 +232,7 @@ struct SidebarView: View {
             .onTapGesture { selectTab(1) }
 
             SidebarItem(
-                title: "Statistics",
+                title: L("sidebar.statistics"),
                 icon: "chart.bar.fill",
                 isSelected: selectedTab == 2,
                 accentColor: accentColor,
@@ -241,7 +242,7 @@ struct SidebarView: View {
             .onTapGesture { selectTab(2) }
 
             SidebarItem(
-                title: "Settings",
+                title: L("sidebar.settings"),
                 icon: "gearshape.fill",
                 isSelected: selectedTab == 3,
                 accentColor: accentColor,
@@ -251,7 +252,7 @@ struct SidebarView: View {
             .onTapGesture { selectTab(3) }
 
             SidebarItem(
-                title: "Help & About",
+                title: L("sidebar.helpAbout"),
                 icon: "questionmark.circle.fill",
                 isSelected: selectedTab == 4,
                 accentColor: accentColor,
@@ -269,7 +270,7 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 8) {
             // Section header with count
             HStack {
-                Text("Tasks")
+                Text(L("sidebar.tasks"))
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(theme.textSecondary)
                     .textCase(.uppercase)
@@ -301,14 +302,14 @@ struct SidebarView: View {
                             Image(systemName: "cursorarrow")
                                 .font(.system(size: 12))
                                 .frame(width: 16)
-                            Text("Click to set as active task")
+                            Text(L("sidebar.tasks.hint.click"))
                                 .font(.system(size: 12))
                         }
                         HStack(spacing: 8) {
                             Image(systemName: "cursorarrow.motionlines")
                                 .font(.system(size: 12))
                                 .frame(width: 16)
-                            Text("Right-click for more options")
+                            Text(L("sidebar.tasks.hint.rightClick"))
                                 .font(.system(size: 12))
                         }
                     }
@@ -412,7 +413,7 @@ struct SidebarView: View {
                     }
 
                     HStack(spacing: 6) {
-                        TextField("Add task...", text: $newTodoTitle)
+                        TextField(L("sidebar.tasks.addPlaceholder"), text: $newTodoTitle)
                             .textFieldStyle(PlainTextFieldStyle())
                             .font(.system(size: 12))
                             .padding(.horizontal, 8)
@@ -452,7 +453,7 @@ struct SidebarView: View {
                             Image(systemName: "checklist")
                                 .font(.system(size: 20))
                                 .foregroundColor(theme.textSecondary.opacity(0.5))
-                            Text("No tasks yet")
+                            Text(L("sidebar.tasks.noTasks"))
                                 .font(.system(size: 12))
                                 .foregroundColor(theme.textSecondary.opacity(0.6))
                         }
@@ -521,7 +522,7 @@ struct SidebarView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: showCompleted ? "chevron.down" : "chevron.right")
                                         .font(.system(size: 9, weight: .semibold))
-                                    Text("Completed")
+                                    Text(L("sidebar.tasks.completed"))
                                         .font(.system(size: 11, weight: .medium))
                                     Text("\(completedTodos.count)")
                                         .font(.system(size: 10, weight: .medium))
@@ -535,7 +536,7 @@ struct SidebarView: View {
 
                             if showCompleted {
                                 Button(action: clearCompleted) {
-                                    Text("Clear")
+                                    Text(L("sidebar.tasks.clear"))
                                         .font(.system(size: 10, weight: .medium))
                                         .foregroundColor(.secondary)
                                 }
@@ -587,7 +588,7 @@ struct SidebarView: View {
             HStack(spacing: 8) {
                 Image(systemName: "rectangle.compress.vertical")
                     .font(.system(size: 12, weight: .medium))
-                Text("Mini Player")
+                Text(L("sidebar.miniPlayer"))
                     .font(.system(size: 12, weight: .medium))
                 Spacer()
                 Text("\u{2318}M")
@@ -703,7 +704,7 @@ struct TodoRow: View {
                 .buttonStyle(PlainButtonStyle())
 
                 if isEditing {
-                    TextField("Edit task...", text: Binding(
+                    TextField(L("sidebar.tasks.editPlaceholder"), text: Binding(
                         get: { editingText },
                         set: { onEditingTextChange($0) }
                     ))
@@ -779,11 +780,11 @@ struct TodoRow: View {
                     if isHovered {
                         Menu {
                             Button(action: { showDueDatePicker.toggle() }) {
-                                Label(todo.dueDate != nil ? "Change Due Date" : "Set Due Date", systemImage: "calendar")
+                                Label(todo.dueDate != nil ? L("sidebar.tasks.changeDueDate") : L("sidebar.tasks.setDueDate"), systemImage: "calendar")
                             }
                             if todo.dueDate != nil {
                                 Button(role: .destructive, action: { onChangeDueDate(nil) }) {
-                                    Label("Remove Due Date", systemImage: "calendar.badge.minus")
+                                    Label(L("sidebar.tasks.removeDueDate"), systemImage: "calendar.badge.minus")
                                 }
                             }
                             Divider()
@@ -799,10 +800,10 @@ struct TodoRow: View {
                             }
                             Divider()
                             Button(action: onEdit) {
-                                Label("Edit", systemImage: "pencil")
+                                Label(L("sidebar.tasks.edit"), systemImage: "pencil")
                             }
                             Button(role: .destructive, action: onDelete) {
-                                Label("Delete", systemImage: "trash")
+                                Label(L("sidebar.tasks.delete"), systemImage: "trash")
                             }
                         } label: {
                             Image(systemName: "ellipsis")

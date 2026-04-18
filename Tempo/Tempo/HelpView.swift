@@ -4,6 +4,7 @@ struct HelpView: View {
     @AppStorage(SettingsKeys.Appearance.themeColor.rawValue) private var themeColor: String = "red"
     @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme: String = "default"
     @ObservedObject private var updateManager = UpdateManager.shared
+    @ObservedObject private var locManager = LocalizationManager.shared
 
     private var accentColor: Color { themeColor.themeColor }
     private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
@@ -26,7 +27,7 @@ struct HelpView: View {
                         .font(.system(size: 13, weight: .medium, design: .monospaced))
                         .foregroundColor(.secondary)
 
-                    Text("A focus timer designed for students")
+                    Text(L("help.tagline"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -34,89 +35,34 @@ struct HelpView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 4)
 
-                // Features Grid
                 VStack(alignment: .leading, spacing: 12) {
-                    SectionLabel(text: "Features")
+                    SectionLabel(text: L("help.features"))
 
                     LazyVGrid(columns: [
                         GridItem(.flexible(), spacing: 12),
                         GridItem(.flexible(), spacing: 12)
                     ], spacing: 12) {
-                        FeatureCard(
-                            icon: "timer",
-                            title: "Focus Timer",
-                            description: "Pomodoro sessions with focus, short break, and long break cycles",
-                            accent: accentColor,
-                            theme: theme
-                        )
-                        FeatureCard(
-                            icon: "rectangle.stack",
-                            title: "Session Presets",
-                            description: "Focus (25m), Deep Work (50m), Quick (15m), or create your own",
-                            accent: accentColor,
-                            theme: theme
-                        )
-                        FeatureCard(
-                            icon: "music.note",
-                            title: "Zen Music",
-                            description: "Ambient music that auto-plays during focus and pauses on breaks",
-                            accent: accentColor,
-                            theme: theme
-                        )
-                        FeatureCard(
-                            icon: "checklist",
-                            title: "Todo List",
-                            description: "Manage tasks with priorities, link them to sessions, and track progress",
-                            accent: accentColor,
-                            theme: theme
-                        )
-                        FeatureCard(
-                            icon: "chart.bar",
-                            title: "Statistics",
-                            description: "Daily, weekly, and monthly insights with streaks and session history",
-                            accent: accentColor,
-                            theme: theme
-                        )
-                        FeatureCard(
-                            icon: "brain",
-                            title: "AI Insights",
-                            description: "On-device ML analyzes your sessions to provide even more personalized focus recommendations",
-                            accent: accentColor,
-                            theme: theme
-                        )
-                        FeatureCard(
-                            icon: "trophy",
-                            title: "Achievements",
-                            description: "12 unlockable milestones like Early Bird, Streak Master, and more",
-                            accent: accentColor,
-                            theme: theme
-                        )
-                        FeatureCard(
-                            icon: "pip",
-                            title: "Mini Player",
-                            description: "Compact floating timer that stays on top across all spaces",
-                            accent: accentColor,
-                            theme: theme
-                        )
-                        FeatureCard(
-                            icon: "paintpalette",
-                            title: "Themes & Colors",
-                            description: "5 app themes, 12 accent colors, and 3 animation styles",
-                            accent: accentColor,
-                            theme: theme
-                        )
+                        FeatureCard(icon: "timer", title: L("help.feature.timer.title"), description: L("help.feature.timer.desc"), accent: accentColor, theme: theme)
+                        FeatureCard(icon: "rectangle.stack", title: L("help.feature.presets.title"), description: L("help.feature.presets.desc"), accent: accentColor, theme: theme)
+                        FeatureCard(icon: "music.note", title: L("help.feature.zen.title"), description: L("help.feature.zen.desc"), accent: accentColor, theme: theme)
+                        FeatureCard(icon: "checklist", title: L("help.feature.todo.title"), description: L("help.feature.todo.desc"), accent: accentColor, theme: theme)
+                        FeatureCard(icon: "chart.bar", title: L("help.feature.stats.title"), description: L("help.feature.stats.desc"), accent: accentColor, theme: theme)
+                        FeatureCard(icon: "brain", title: L("help.feature.ai.title"), description: L("help.feature.ai.desc"), accent: accentColor, theme: theme)
+                        FeatureCard(icon: "trophy", title: L("help.feature.achievements.title"), description: L("help.feature.achievements.desc"), accent: accentColor, theme: theme)
+                        FeatureCard(icon: "pip", title: L("help.feature.miniPlayer.title"), description: L("help.feature.miniPlayer.desc"), accent: accentColor, theme: theme)
+                        FeatureCard(icon: "paintpalette", title: L("help.feature.themes.title"), description: L("help.feature.themes.desc"), accent: accentColor, theme: theme)
                     }
                 }
 
                 // Quick Start
                 VStack(alignment: .leading, spacing: 12) {
-                    SectionLabel(text: "Quick Start")
+                    SectionLabel(text: L("help.quickStart"))
 
                     VStack(alignment: .leading, spacing: 0) {
-                        QuickStartRow(step: "1", text: "Press Space to start a focus session", isLast: false, accent: accentColor, theme: theme)
-                        QuickStartRow(step: "2", text: "Work until the timer ends — a break starts automatically", isLast: false, accent: accentColor, theme: theme)
-                        QuickStartRow(step: "3", text: "Every 4 sessions, enjoy a longer break", isLast: false, accent: accentColor, theme: theme)
-                        QuickStartRow(step: "4", text: "Track your progress in Statistics and unlock Achievements", isLast: true, accent: accentColor, theme: theme)
+                        QuickStartRow(step: "1", text: L("help.step1"), isLast: false, accent: accentColor, theme: theme)
+                        QuickStartRow(step: "2", text: L("help.step2"), isLast: false, accent: accentColor, theme: theme)
+                        QuickStartRow(step: "3", text: L("help.step3"), isLast: false, accent: accentColor, theme: theme)
+                        QuickStartRow(step: "4", text: L("help.step4"), isLast: true, accent: accentColor, theme: theme)
                     }
                     .padding(16)
                     .background(theme.cardBackground)
@@ -126,16 +72,16 @@ struct HelpView: View {
 
                 // Keyboard Shortcuts
                 VStack(alignment: .leading, spacing: 12) {
-                    SectionLabel(text: "Keyboard Shortcuts")
+                    SectionLabel(text: L("help.shortcuts"))
 
                     VStack(spacing: 0) {
-                        ShortcutRow(keys: "Space", action: "Start / Pause timer")
+                        ShortcutRow(keys: "Space", action: L("help.shortcut.space"))
                         Divider().padding(.horizontal, 12)
-                        ShortcutRow(keys: "⌘ R", action: "Stop and reset")
+                        ShortcutRow(keys: "⌘ R", action: L("help.shortcut.cmdR"))
                         Divider().padding(.horizontal, 12)
-                        ShortcutRow(keys: "⌘ S", action: "Skip to next session")
+                        ShortcutRow(keys: "⌘ S", action: L("help.shortcut.cmdS"))
                         Divider().padding(.horizontal, 12)
-                        ShortcutRow(keys: "⌘ M", action: "Open Mini Player")
+                        ShortcutRow(keys: "⌘ M", action: L("help.shortcut.cmdM"))
                     }
                     .padding(.vertical, 4)
                     .background(theme.cardBackground)
@@ -145,40 +91,16 @@ struct HelpView: View {
 
                 // AI & ML Features
                 VStack(alignment: .leading, spacing: 12) {
-                    SectionLabel(text: "AI & Machine Learning")
+                    SectionLabel(text: L("help.aiML"))
 
                     VStack(spacing: 0) {
-                        AIFeatureRow(
-                            icon: "chart.line.uptrend.xyaxis",
-                            title: "Productivity Peak Detection",
-                            description: "Identifies which hours and days you focus best based on your session history.",
-                            accent: accentColor,
-                            theme: theme
-                        )
+                        AIFeatureRow(icon: "chart.line.uptrend.xyaxis", title: L("help.ai.peak.title"), description: L("help.ai.peak.desc"), accent: accentColor, theme: theme)
                         Divider().padding(.horizontal, 12)
-                        AIFeatureRow(
-                            icon: "waveform.path.ecg",
-                            title: "Focus Quality Scoring",
-                            description: "Scores each session using duration, completion, and time-of-day patterns to measure true focus quality.",
-                            accent: accentColor,
-                            theme: theme
-                        )
+                        AIFeatureRow(icon: "waveform.path.ecg", title: L("help.ai.quality.title"), description: L("help.ai.quality.desc"), accent: accentColor, theme: theme)
                         Divider().padding(.horizontal, 12)
-                        AIFeatureRow(
-                            icon: "lightbulb.fill",
-                            title: "Smart Session Suggestions",
-                            description: "Recommends an optimal session length based on your recent performance and patterns.",
-                            accent: accentColor,
-                            theme: theme
-                        )
+                        AIFeatureRow(icon: "lightbulb.fill", title: L("help.ai.suggest.title"), description: L("help.ai.suggest.desc"), accent: accentColor, theme: theme)
                         Divider().padding(.horizontal, 12)
-                        AIFeatureRow(
-                            icon: "lock.shield",
-                            title: "On-Device & Private",
-                            description: "All analysis runs locally on your Mac. No data ever leaves your device.",
-                            accent: accentColor,
-                            theme: theme
-                        )
+                        AIFeatureRow(icon: "lock.shield", title: L("help.ai.private.title"), description: L("help.ai.private.desc"), accent: accentColor, theme: theme)
                     }
                     .background(theme.cardBackground)
                     .cornerRadius(12)
@@ -187,13 +109,13 @@ struct HelpView: View {
 
                 // Credits
                 VStack(alignment: .leading, spacing: 12) {
-                    SectionLabel(text: "Credits")
+                    SectionLabel(text: L("help.credits"))
 
                     VStack(alignment: .leading, spacing: 10) {
-                        CreditRow(label: "Zen Music", value: "\"Inner Peace\" by Grand_Project (Pixabay)")
-                        CreditRow(label: "Zen Music", value: "\"Zen Moods\" by djovan (Pixabay)")
-                        CreditRow(label: "Zen Music", value: "\"Zen Garden\" by Grand_Project (Pixabay)")
-                        CreditRow(label: "App Icon", value: "Created by Backtosq1")
+                        CreditRow(label: L("help.credit.zenMusic"), value: "\"Inner Peace\" by Grand_Project (Pixabay)")
+                        CreditRow(label: L("help.credit.zenMusic"), value: "\"Zen Moods\" by djovan (Pixabay)")
+                        CreditRow(label: L("help.credit.zenMusic"), value: "\"Zen Garden\" by Grand_Project (Pixabay)")
+                        CreditRow(label: L("help.credit.appIcon"), value: "Created by Backtosq1")
                     }
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)

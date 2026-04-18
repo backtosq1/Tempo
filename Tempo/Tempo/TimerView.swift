@@ -12,6 +12,7 @@ struct TimerView: View {
     @AppStorage(SettingsKeys.Appearance.animationStyle.rawValue) private var animationStyle = "smooth"
     
     @StateObject private var zenPlayer = ZenMusicPlayer.shared
+    @ObservedObject private var locManager = LocalizationManager.shared
     
     @State private var pulsate = false
     @State private var glow = false
@@ -24,6 +25,14 @@ struct TimerView: View {
     
     private var accentColor: Color { themeColorValue.themeColor }
     private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
+
+    private var localizedModeName: String {
+        switch timerManager.mode {
+        case .focus: return L("timer.mode.focus")
+        case .shortBreak: return L("timer.mode.shortBreak")
+        case .longBreak: return L("timer.mode.longBreak")
+        }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -112,7 +121,7 @@ struct TimerView: View {
                 Circle()
                     .fill(accentColor)
                     .frame(width: 8, height: 8)
-                Text(timerManager.currentSessionName.isEmpty ? "Select Session" : timerManager.currentSessionName)
+                Text(timerManager.currentSessionName.isEmpty ? L("timer.selectSession") : timerManager.currentSessionName)
                     .font(.system(size: 12, weight: .medium))
                 Image(systemName: "chevron.down")
                     .font(.system(size: 10))
@@ -136,7 +145,7 @@ struct TimerView: View {
                 timerManager.setActiveTask(nil)
             }) {
                 HStack {
-                    Text("No Task")
+                    Text(L("timer.noTask"))
                     if timerManager.activeTaskId == nil {
                         Image(systemName: "checkmark")
                     }
@@ -165,11 +174,11 @@ struct TimerView: View {
                 Image(systemName: "checklist")
                     .font(.system(size: 10))
                 if let name = activeTaskName {
-                    Text("Working on: \(name)")
+                    Text(LF("timer.workingOn", name))
                         .font(.system(size: 12, weight: .medium))
                         .lineLimit(1)
                 } else {
-                    Text("Select Task")
+                    Text(L("timer.selectTask"))
                         .font(.system(size: 12, weight: .medium))
                 }
                 Image(systemName: "chevron.down")
@@ -185,7 +194,7 @@ struct TimerView: View {
 
     private var modeHeader: some View {
         VStack(spacing: 8) {
-            Text(timerManager.mode.rawValue.uppercased())
+            Text(localizedModeName)
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(accentColor.opacity(0.7))
                 .tracking(1.5)
@@ -305,7 +314,7 @@ struct TimerView: View {
             
             // Center content
             VStack(spacing: 12) {
-                Text("Time Remaining")
+                Text(L("timer.timeRemaining"))
                     .font(.caption)
                     .foregroundColor(theme.textSecondary)
                     .tracking(1)
@@ -331,7 +340,7 @@ struct TimerView: View {
         HStack(spacing: 20) {
             // Stop button
             ControlButton(
-                title: "Stop",
+                title: L("timer.stop"),
                 icon: "stop.fill",
                 color: .gray,
                 action: { timerManager.stop() },
@@ -340,7 +349,7 @@ struct TimerView: View {
             
             // Main control button
             ControlButton(
-                title: timerManager.state == .running ? "Pause" : "Start",
+                title: timerManager.state == .running ? L("timer.pause") : L("timer.start"),
                 icon: timerManager.state == .running ? "pause.fill" : "play.fill",
                 color: timerManager.state == .running ? .orange : accentColor,
                 action: {
@@ -361,7 +370,7 @@ struct TimerView: View {
             
             // Skip button
             ControlButton(
-                title: "Skip",
+                title: L("timer.skip"),
                 icon: "forward.fill",
                 color: .green,
                 action: { timerManager.skip() }
@@ -380,7 +389,7 @@ struct TimerView: View {
                         Image(systemName: zenPlayer.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                             .font(.system(size: 18))
 
-                        Text(zenPlayer.isPlaying ? zenPlayer.getCurrentStationName() : "Play Zen Music")
+                        Text(zenPlayer.isPlaying ? zenPlayer.getCurrentStationName() : L("timer.playZenMusic"))
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundColor(zenPlayer.isPlaying ? accentColor : .secondary)
@@ -403,7 +412,7 @@ struct TimerView: View {
                         .background(Circle().fill(Color.gray.opacity(0.1)))
                 }
                 .buttonStyle(PlainButtonStyle())
-                .help("Next track")
+                .help(L("timer.nextTrack"))
             }
             .padding(.top, 16)
             .onChange(of: timerManager.mode) { _, newMode in

@@ -4,6 +4,7 @@ import SwiftUI
 /// Compact floating timer window that stays on top of other apps
 struct MiniPlayerView: View {
     @ObservedObject var timerManager: TimerManager
+    @ObservedObject private var locManager = LocalizationManager.shared
 
     @State private var appear = false
     @State private var isHovered = false
@@ -69,7 +70,7 @@ struct MiniPlayerView: View {
                 Menu {
                     Button(action: { timerManager.setActiveTask(nil) }) {
                         HStack {
-                            Text("No Task")
+                            Text(L("timer.noTask"))
                             if timerManager.activeTaskId == nil {
                                 Image(systemName: "checkmark")
                             }
@@ -111,7 +112,7 @@ struct MiniPlayerView: View {
                                     .foregroundColor(dueDateColor(for: due))
                             }
                         } else {
-                            Text("Select Task")
+                            Text(L("timer.selectTask"))
                                 .font(.system(size: 11))
                                 .foregroundColor(theme.textSecondary)
                         }

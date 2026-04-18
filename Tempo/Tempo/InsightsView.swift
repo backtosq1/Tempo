@@ -6,6 +6,7 @@ import SwiftUI
 struct InsightsView: View {
     @ObservedObject var timerManager: TimerManager
     @StateObject private var insightsEngine = InsightsEngine.shared
+    @ObservedObject private var locManager = LocalizationManager.shared
 
     @State private var selectedInsight: Insight?
     @State private var showPrivacyNotice = false
@@ -76,6 +77,11 @@ struct InsightsView: View {
                 appear = true
             }
         }
+        .onChange(of: locManager.currentLanguage) { _, _ in
+            if hasEnoughData {
+                insightsEngine.refreshInsights(history: timerManager.getSessionHistory())
+            }
+        }
         .sheet(isPresented: $showPrivacyNotice) {
             aiPrivacyNotice
         }
@@ -90,11 +96,11 @@ struct InsightsView: View {
         VStack(spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("AI Insights")
+                    Text(L("insights.title"))
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(theme.textPrimary)
-                    Text("Personalized productivity recommendations")
+                    Text(L("insights.subtitle"))
                         .font(.subheadline)
                         .foregroundColor(theme.textSecondary)
                 }
@@ -174,10 +180,10 @@ struct InsightsView: View {
         return VStack(spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Productivity Score")
+                    Text(L("insights.productivityScore"))
                         .font(.headline)
                         .foregroundColor(theme.textPrimary)
-                    Text("Based on completion rate, consistency, and focus quality")
+                    Text(L("insights.scoreDesc"))
                         .font(.caption)
                         .foregroundColor(theme.textSecondary)
                 }
@@ -242,7 +248,7 @@ struct InsightsView: View {
                 .lineLimit(3)
 
             if insight.actionable {
-                Label("Action recommended", systemImage: "hand.tap.fill")
+                Label(L("insights.actionRecommended"), systemImage: "hand.tap.fill")
                     .font(.caption)
                     .foregroundColor(accentColor)
             }
@@ -270,7 +276,7 @@ struct InsightsView: View {
             if scores.count >= 3 {
                 let avg = scores.reduce(0, +) / Double(scores.count)
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Recent Focus Quality")
+                    Text(L("insights.recentQuality"))
                         .font(.headline)
                         .foregroundColor(theme.textPrimary)
 
@@ -279,7 +285,7 @@ struct InsightsView: View {
                             Text(String(format: "%.0f%%", avg * 100))
                                 .font(.system(size: 28, weight: .bold, design: .rounded))
                                 .foregroundColor(accentColor)
-                            Text("Avg Quality")
+                            Text(L("insights.avgQuality"))
                                 .font(.caption)
                                 .foregroundColor(theme.textSecondary)
                         }
@@ -288,7 +294,7 @@ struct InsightsView: View {
                             Text(FocusQualityModel.ratingLabel(for: avg))
                                 .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(theme.textPrimary)
-                            Text("Rating")
+                            Text(L("insights.rating"))
                                 .font(.caption)
                                 .foregroundColor(theme.textSecondary)
                         }
@@ -300,7 +306,7 @@ struct InsightsView: View {
                             Text(String(format: "%.1f", avgInterruptions))
                                 .font(.system(size: 28, weight: .bold, design: .rounded))
                                 .foregroundColor(avgInterruptions > 3 ? .red : .green)
-                            Text("Avg Pauses")
+                            Text(L("insights.avgPauses"))
                                 .font(.caption)
                                 .foregroundColor(theme.textSecondary)
                         }
@@ -321,10 +327,10 @@ struct InsightsView: View {
             Image(systemName: "brain.head.profile")
                 .font(.system(size: 48))
                 .foregroundColor(theme.textSecondary.opacity(0.5))
-            Text("Not Enough Data Yet")
+            Text(L("insights.noDataYet"))
                 .font(.title3.bold())
                 .foregroundColor(theme.textPrimary)
-            Text("Complete at least 10 focus sessions to unlock AI insights.")
+            Text(L("insights.noDataDesc"))
                 .font(.subheadline)
                 .foregroundColor(theme.textSecondary)
                 .multilineTextAlignment(.center)
@@ -358,10 +364,10 @@ struct InsightsView: View {
             .padding(.top, 40)
 
             VStack(spacing: 8) {
-                Text("AI Insights Locked")
+                Text(L("insights.locked"))
                     .font(.title2.bold())
                     .foregroundColor(theme.textPrimary)
-                Text("Build up your focus history to unlock personalized insights")
+                Text(L("insights.lockedDesc"))
                     .font(.subheadline)
                     .foregroundColor(theme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -373,19 +379,19 @@ struct InsightsView: View {
                 // Sessions requirement
                 progressRow(
                     icon: "checkmark.circle.fill",
-                    title: "Completed Sessions",
+                    title: L("insights.completedSessions"),
                     current: completedCount,
                     required: 10,
-                    suffix: "sessions"
+                    suffix: L("common.sessions")
                 )
 
                 // Days requirement
                 progressRow(
                     icon: "calendar",
-                    title: "Active Days",
+                    title: L("insights.activeDays"),
                     current: daysCount,
                     required: 7,
-                    suffix: "days"
+                    suffix: L("common.days")
                 )
             }
             .padding(.horizontal, 60)
@@ -445,7 +451,7 @@ struct InsightsView: View {
                     .font(.title2.bold())
                     .foregroundColor(theme.textPrimary)
                 Spacer()
-                Button("Done") { selectedInsight = nil }
+                Button(L("insights.done")) { selectedInsight = nil }
                     .buttonStyle(.plain)
                     .foregroundColor(accentColor)
             }
@@ -457,7 +463,7 @@ struct InsightsView: View {
             if insight.actionable {
                 Divider()
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("What You Can Do")
+                    Text(L("insights.whatYouCanDo"))
                         .font(.headline)
                         .foregroundColor(theme.textPrimary)
                     Text(insight.type.actionSuggestion)
@@ -477,17 +483,17 @@ struct InsightsView: View {
 
     private var aiPrivacyNotice: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("AI Insights Privacy")
+            Text(L("insights.privacy.title"))
                 .font(.title.bold())
                 .foregroundColor(theme.textPrimary)
 
-            Text("Tempo's AI insights are powered by on-device analysis. Here's what you should know:")
+            Text(L("insights.privacy.intro"))
                 .foregroundColor(theme.textSecondary)
 
             VStack(alignment: .leading, spacing: 15) {
-                privacyPoint(icon: "lock.shield", title: "100% Private", description: "All analysis happens on your Mac. No data is sent to any server.")
-                privacyPoint(icon: "brain", title: "Learning From You", description: "AI learns your patterns to provide personalized recommendations.")
-                privacyPoint(icon: "hand.raised", title: "You're In Control", description: "Opt out anytime and delete all AI data from Settings.")
+                privacyPoint(icon: "lock.shield", title: L("insights.privacy.private.title"), description: L("insights.privacy.private.desc"))
+                privacyPoint(icon: "brain", title: L("insights.privacy.learning.title"), description: L("insights.privacy.learning.desc"))
+                privacyPoint(icon: "hand.raised", title: L("insights.privacy.control.title"), description: L("insights.privacy.control.desc"))
             }
 
             Spacer()
@@ -496,7 +502,7 @@ struct InsightsView: View {
                 settings.hasSeenAIPrivacyNotice = true
                 showPrivacyNotice = false
             }) {
-                Text("I Understand")
+                Text(L("insights.privacy.understand"))
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)

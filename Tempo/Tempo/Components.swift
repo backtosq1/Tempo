@@ -361,6 +361,7 @@ struct AchievementCard: View {
     var themeColors: ThemeColors = .default
 
     @State private var appear = false
+    @ObservedObject private var locManager = LocalizationManager.shared
 
     var body: some View {
         VStack(spacing: 8) {
@@ -373,7 +374,7 @@ struct AchievementCard: View {
                     .foregroundColor(achievement.isUnlocked ? accentColor : .gray)
             }
 
-            Text(achievement.title)
+            Text(L("achievement.\(achievement.id).title"))
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(achievement.isUnlocked ? themeColors.textPrimary : themeColors.textSecondary)
                 .lineLimit(1)
@@ -396,8 +397,8 @@ struct AchievementCard: View {
         .background(themeColors.cardBackground)
         .cornerRadius(12)
         .help(achievement.isUnlocked
-            ? "\(achievement.description)\nUnlocked!"
-            : "\(achievement.description) (\(achievement.progress)/\(achievement.goal))"
+            ? "\(L("achievement.\(achievement.id).desc"))\n\(L("stats.unlocked"))"
+            : "\(L("achievement.\(achievement.id).desc")) (\(achievement.progress)/\(achievement.goal))"
         )
         .opacity(achievement.isUnlocked ? 1 : 0.6)
         .scaleEffect(appear ? 1 : 0.9)
@@ -418,6 +419,7 @@ struct SessionPresetRow: View {
     var themeColors: ThemeColors = .default
     let onToggleExpand: () -> Void
     let onDelete: () -> Void
+    @ObservedObject private var locManager = LocalizationManager.shared
 
     let accentColors: [(id: String, name: String, color: Color)] = [
         ("red", "Red", .red), ("blue", "Blue", .blue), ("green", "Green", .green),
@@ -453,19 +455,19 @@ struct SessionPresetRow: View {
 
             if isExpanded {
                 VStack(spacing: 16) {
-                    TextField("Session Name", text: $session.name)
+                    TextField(L("settings.sessionName"), text: $session.name)
                         .textFieldStyle(.plain)
                         .font(.system(size: 13))
                         .padding(8)
                         .background(Color.gray.opacity(0.1))
                         .cornerRadius(6)
 
-                    DurationSlider(value: $session.focusDuration, label: "Focus", icon: "brain.head.profile", range: 5...120, suffix: "min", accentColor: accentColor)
-                    DurationSlider(value: $session.shortBreakDuration, label: "Short Break", icon: "cup.and.saucer", range: 1...30, suffix: "min", accentColor: accentColor)
-                    DurationSlider(value: $session.longBreakDuration, label: "Long Break", icon: "bed.double.fill", range: 5...60, suffix: "min", accentColor: accentColor)
+                    DurationSlider(value: $session.focusDuration, label: L("settings.focus"), icon: "brain.head.profile", range: 5...120, suffix: L("common.min"), accentColor: accentColor)
+                    DurationSlider(value: $session.shortBreakDuration, label: L("settings.shortBreak"), icon: "cup.and.saucer", range: 1...30, suffix: L("common.min"), accentColor: accentColor)
+                    DurationSlider(value: $session.longBreakDuration, label: L("settings.longBreak"), icon: "bed.double.fill", range: 5...60, suffix: L("common.min"), accentColor: accentColor)
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Color")
+                        Text(L("settings.color"))
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(themeColors.textSecondary)
 
@@ -489,7 +491,7 @@ struct SessionPresetRow: View {
                         Button(action: onDelete) {
                             HStack {
                                 Image(systemName: "trash")
-                                Text("Delete Session")
+                                Text(L("settings.deleteSession"))
                             }
                             .font(.system(size: 12))
                             .foregroundColor(.red)

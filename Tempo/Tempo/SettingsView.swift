@@ -33,6 +33,8 @@ struct SettingsView: View {
     @AppStorage(SettingsKeys.Insights.enableInsights.rawValue) private var enableInsights = true
     @AppStorage(SettingsKeys.Insights.enablePostSessionFeedback.rawValue) private var enablePostSessionFeedback = false
 
+    @ObservedObject private var locManager = LocalizationManager.shared
+
     private var accentColor: Color { themeColor.themeColor }
     private var theme: ThemeColors { ThemeManager.colors(for: appTheme, accent: accentColor) }
 
@@ -60,48 +62,48 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 30) {
                 // Header
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Settings")
+                    Text(L("settings.title"))
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(theme.textPrimary)
-                    Text("Customize Tempo")
+                    Text(L("settings.subtitle"))
                         .font(.subheadline)
                         .foregroundColor(theme.textSecondary)
                 }
                 .padding(.top, 20)
 
                 // Timer Settings
-                SettingsSection(title: "Timer Settings", icon: "timer", accentColor: accentColor, themeColors: theme) {
+                SettingsSection(title: L("settings.timerSettings"), icon: "timer", accentColor: accentColor, themeColors: theme) {
                     DurationSlider(
                         value: $focusDuration,
-                        label: "Focus Duration",
+                        label: L("settings.focusDuration"),
                         icon: "brain.head.profile",
                         range: 5...60,
-                        suffix: "min",
+                        suffix: L("common.min"),
                         accentColor: accentColor
                     )
 
                     DurationSlider(
                         value: $shortBreakDuration,
-                        label: "Short Break",
+                        label: L("settings.shortBreak"),
                         icon: "cup.and.saucer",
                         range: 1...15,
-                        suffix: "min",
+                        suffix: L("common.min"),
                         accentColor: accentColor
                     )
 
                     DurationSlider(
                         value: $longBreakDuration,
-                        label: "Long Break",
+                        label: L("settings.longBreak"),
                         icon: "bed.double.fill",
                         range: 5...30,
-                        suffix: "min",
+                        suffix: L("common.min"),
                         accentColor: accentColor
                     )
                 }
 
                 // Session Presets
-                SettingsSection(title: "Session Presets", icon: "list.bullet", accentColor: accentColor, themeColors: theme) {
+                SettingsSection(title: L("settings.sessionPresets"), icon: "list.bullet", accentColor: accentColor, themeColors: theme) {
                     ForEach($editableSessions) { $session in
                         SessionPresetRow(
                             session: $session,
@@ -137,7 +139,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "plus.circle.fill")
                                 .foregroundColor(accentColor)
-                            Text("Add Session")
+                            Text(L("settings.addSession"))
                                 .foregroundColor(accentColor)
                             Spacer()
                         }
@@ -150,48 +152,48 @@ struct SettingsView: View {
                 }
 
                 // Behavior
-                SettingsSection(title: "Behavior", icon: "arrow.triangle.2.circlepath", accentColor: accentColor, themeColors: theme) {
+                SettingsSection(title: L("settings.behavior"), icon: "arrow.triangle.2.circlepath", accentColor: accentColor, themeColors: theme) {
                     ToggleRow(
                         icon: "play.circle.fill",
-                        label: "Auto-start breaks",
+                        label: L("settings.autoStartBreaks"),
                         isOn: $autoStartBreaks,
                         accentColor: accentColor
                     )
 
                     ToggleRow(
                         icon: "pause.circle.fill",
-                        label: "Auto-start focus sessions",
+                        label: L("settings.autoStartFocus"),
                         isOn: $autoStartFocus,
                         accentColor: accentColor
                     )
                 }
 
                 // Notifications & Sounds
-                SettingsSection(title: "Notifications & Sounds", icon: "bell.badge.fill", accentColor: accentColor, themeColors: theme) {
+                SettingsSection(title: L("settings.notificationsAndSounds"), icon: "bell.badge.fill", accentColor: accentColor, themeColors: theme) {
                     ToggleRow(
                         icon: "bell.fill",
-                        label: "Enable notifications",
+                        label: L("settings.enableNotifications"),
                         isOn: $enableNotifications,
                         accentColor: accentColor
                     )
 
                     ToggleRow(
                         icon: "speaker.wave.2.fill",
-                        label: "Enable sounds",
+                        label: L("settings.enableSounds"),
                         isOn: $enableSounds,
                         accentColor: accentColor
                     )
 
                     ToggleRow(
                         icon: "music.note",
-                        label: "Enable zen music during focus",
+                        label: L("settings.enableZenMusic"),
                         isOn: $enableZenMusic,
                         accentColor: accentColor
                     )
                 }
 
                 // Theme
-                SettingsSection(title: "Theme", icon: "sparkles", accentColor: accentColor, themeColors: theme) {
+                SettingsSection(title: L("settings.theme"), icon: "sparkles", accentColor: accentColor, themeColors: theme) {
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(spacing: 12) {
                             ForEach(AppTheme.allCases) { t in
@@ -211,7 +213,7 @@ struct SettingsView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: currentTheme.forcesDarkMode ? "moon.fill" : "sun.max.fill")
                                     .font(.caption2)
-                                Text("This theme uses \(currentTheme.forcesDarkMode ? "dark" : "light") mode")
+                                Text(LF("settings.themeUses", currentTheme.forcesDarkMode ? L("settings.dark") : L("settings.light")))
                                     .font(.caption)
                             }
                             .foregroundColor(theme.textSecondary)
@@ -220,10 +222,10 @@ struct SettingsView: View {
                 }
 
                 // Appearance
-                SettingsSection(title: "Appearance", icon: "paintbrush.fill", accentColor: accentColor, themeColors: theme) {
+                SettingsSection(title: L("settings.appearance"), icon: "paintbrush.fill", accentColor: accentColor, themeColors: theme) {
                     // Appearance mode picker
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Appearance Mode")
+                        Text(L("settings.appearanceMode"))
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(theme.textSecondary)
 
@@ -238,7 +240,7 @@ struct SettingsView: View {
 
                     // Animation style picker
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Animation Style")
+                        Text(L("settings.animationStyle"))
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(theme.textSecondary)
 
@@ -252,13 +254,13 @@ struct SettingsView: View {
 
                     ToggleRow(
                         icon: "lock.fill",
-                        label: "Keep theme color when switching sessions",
+                        label: L("settings.keepThemeColor"),
                         isOn: $overrideThemeColor,
                         accentColor: accentColor
                     )
 
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Accent Color")
+                        Text(L("settings.accentColor"))
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(theme.textSecondary)
 
@@ -280,11 +282,54 @@ struct SettingsView: View {
                     .padding(.vertical, 8)
                 }
 
+                // Language
+                SettingsSection(title: L("settings.language"), icon: "globe", accentColor: accentColor, themeColors: theme) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(L("settings.appLanguage"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(theme.textSecondary)
+
+                        HStack(spacing: 10) {
+                            ForEach(LocalizationManager.Language.allCases, id: \.self) { lang in
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        locManager.setLanguage(lang)
+                                    }
+                                }) {
+                                    HStack(spacing: 8) {
+                                        Text(lang.displayName)
+                                            .font(.system(size: 13, weight: locManager.currentLanguage == lang ? .semibold : .regular))
+                                        if locManager.currentLanguage == lang {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(size: 10, weight: .bold))
+                                        }
+                                    }
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(locManager.currentLanguage == lang ? accentColor.opacity(0.15) : Color.gray.opacity(0.1))
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(locManager.currentLanguage == lang ? accentColor.opacity(0.4) : Color.clear, lineWidth: 1)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+
+                        Text(L("settings.languageNote"))
+                            .font(.caption)
+                            .foregroundColor(theme.textSecondary)
+                    }
+                }
+
                 // AI Insights
-                SettingsSection(title: "AI Insights", icon: "brain.head.profile", accentColor: accentColor, themeColors: theme) {
+                SettingsSection(title: L("settings.aiInsights"), icon: "brain.head.profile", accentColor: accentColor, themeColors: theme) {
                     ToggleRow(
                         icon: "sparkles",
-                        label: "Enable AI Insights",
+                        label: L("settings.enableAIInsights"),
                         isOn: $enableInsights,
                         accentColor: accentColor
                     )
@@ -292,7 +337,7 @@ struct SettingsView: View {
                     if enableInsights {
                         ToggleRow(
                             icon: "text.bubble",
-                            label: "Post-session feedback prompt",
+                            label: L("settings.postSessionFeedback"),
                             isOn: $enablePostSessionFeedback,
                             accentColor: accentColor
                         )
@@ -302,7 +347,7 @@ struct SettingsView: View {
                             HStack {
                                 Image(systemName: "location.fill")
                                     .frame(width: 20)
-                                Text("Current Location")
+                                Text(L("settings.currentLocation"))
                                 Spacer()
                             }
                             .font(.system(size: 14, weight: .medium))
@@ -366,7 +411,7 @@ struct SettingsView: View {
                             HStack {
                                 Image(systemName: "trash")
                                     .foregroundColor(.red)
-                                Text("Clear AI Data")
+                                Text(L("settings.clearAIData"))
                                     .foregroundColor(.red)
                                 Spacer()
                             }
@@ -377,7 +422,7 @@ struct SettingsView: View {
                 }
 
                 // Reset & About
-                SettingsSection(title: "About", icon: "info.circle.fill", accentColor: accentColor, themeColors: theme) {
+                SettingsSection(title: L("settings.about"), icon: "info.circle.fill", accentColor: accentColor, themeColors: theme) {
                     VStack(spacing: 16) {
                         Button(action: {
                             updateManager.checkForUpdates()
@@ -385,7 +430,7 @@ struct SettingsView: View {
                             HStack {
                                 Image(systemName: "arrow.down.circle")
                                     .foregroundColor(accentColor)
-                                Text("Check for Updates in App Store")
+                                Text(L("settings.checkForUpdates"))
                                     .foregroundColor(accentColor)
                                 Spacer()
                                 if updateManager.isChecking {
@@ -407,7 +452,7 @@ struct SettingsView: View {
                             HStack {
                                 Image(systemName: "arrow.counterclockwise")
                                     .foregroundColor(.red)
-                                Text("Reset All Data")
+                                Text(L("settings.resetAllData"))
                                     .foregroundColor(.red)
                                 Spacer()
                             }
@@ -444,52 +489,52 @@ struct SettingsView: View {
                 showingUpdateAlert = true
             }
         }
-        .alert("Reset All Data?", isPresented: $showingResetConfirmation) {
-            Button("Cancel", role: .cancel) { }
-            Button("Reset", role: .destructive) {
+        .alert(L("settings.resetAllDataTitle"), isPresented: $showingResetConfirmation) {
+            Button(L("settings.cancel"), role: .cancel) { }
+            Button(L("settings.reset"), role: .destructive) {
                 resetAllData()
             }
         } message: {
-            Text("This will delete all your statistics and reset settings to defaults. This action cannot be undone.")
+            Text(L("settings.resetMessage"))
         }
-        .alert("Check for Updates", isPresented: $showingUpdateAlert) {
+        .alert(L("settings.checkForUpdatesTitle"), isPresented: $showingUpdateAlert) {
             if updateManager.updateAvailable {
-                Button("Update in App Store") {
+                Button(L("settings.updateInAppStore")) {
                     updateManager.openAppStore()
                 }
-                Button("Later", role: .cancel) { }
+                Button(L("settings.later"), role: .cancel) { }
             } else if updateManager.errorMessage != nil {
-                Button("OK", role: .cancel) { }
+                Button(L("settings.ok"), role: .cancel) { }
             } else {
-                Button("OK", role: .cancel) { }
+                Button(L("settings.ok"), role: .cancel) { }
             }
         } message: {
             if updateManager.updateAvailable {
-                Text("Version \(updateManager.latestVersion) is available. You are currently using version \(updateManager.currentVersion).")
+                Text(LF("settings.updateAvailable", updateManager.latestVersion, updateManager.currentVersion))
             } else if let error = updateManager.errorMessage {
-                Text("Failed to check for updates: \(error)")
+                Text(LF("settings.updateFailed", error))
             } else {
-                Text("You are using the latest version.")
+                Text(L("settings.upToDate"))
             }
         }
-        .confirmationDialog("Delete Session?", isPresented: $showingDeleteConfirmation, titleVisibility: .visible) {
-            Button("Delete", role: .destructive) {
+        .confirmationDialog(L("settings.deleteSessionTitle"), isPresented: $showingDeleteConfirmation, titleVisibility: .visible) {
+            Button(L("sidebar.tasks.delete"), role: .destructive) {
                 if let id = sessionToDelete {
                     editableSessions.removeAll { $0.id == id }
                     sessionToDelete = nil
                 }
             }
-            Button("Cancel", role: .cancel) {
+            Button(L("settings.cancel"), role: .cancel) {
                 sessionToDelete = nil
             }
         }
-        .alert("Clear AI Data?", isPresented: $showingClearAIConfirmation) {
-            Button("Cancel", role: .cancel) { }
-            Button("Clear", role: .destructive) {
+        .alert(L("settings.clearAIDataTitle"), isPresented: $showingClearAIConfirmation) {
+            Button(L("settings.cancel"), role: .cancel) { }
+            Button(L("sidebar.tasks.clear"), role: .destructive) {
                 InsightsEngine.shared.clearAllAIData()
             }
         } message: {
-            Text("This will delete all cached insights and AI analysis data. Your session history will not be affected.")
+            Text(L("settings.clearAIDataMessage"))
         }
     }
 
