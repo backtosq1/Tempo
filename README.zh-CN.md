@@ -1,104 +1,100 @@
 # Tempo
 
+<div align="center">
+  <a href="README.md">English</a> | <a href="README.zh-CN.md">简体中文</a>
+</div>
+
+<br>
+
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-2.1.0-red?style=for-the-badge" alt="Version">
+  <img src="https://img.shields.io/badge/版本-2.1.0-red?style=for-the-badge" alt="Version">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
-  <img src="https://img.shields.io/badge/Platform-macOS-black?style=for-the-badge" alt="Platform">
-  <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="156" height="40" alt="Download_on_the_Mac_App_Store_Badge_US-UK_RGB_wht_092917" src="https://github.com/user-attachments/assets/56268041-4729-42db-bb59-ac96374b8600"/></a>
+  <img src="https://img.shields.io/badge/平台-macOS-black?style=for-the-badge" alt="Platform"> <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="140" height="40" alt="Download_on_the_Mac_App_Store_Badge_CNSC_RGB_wht_092917" src="https://github.com/user-attachments/assets/bed60738-7df6-43e1-b945-7caa5040c7c9" /></a></p>
 </p>
 
 <p align="center">
-  <strong>A focus timer for students.</strong><br>
-  Level up your work with a customizable systematic focus routine, AI-powered focus recommendations, productivity statistics, and more!
+  <strong>专为学生的深度专注与习惯养成设计的番茄钟应用。</strong><br>
+  可自定义的系统化专注流程、AI 模型分析、专注数据等帮你 level up 专注效率！
 </p>
 
 ---
 
-## 🍅 How does it work?
+## 🍅 原理：
 
-Tempo makes use of the popular [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique), a time management technique developed in the 1980s.
+Tempo 使用了备受欢迎的[番茄钟技巧](https://en.wikipedia.org/wiki/Pomodoro_Technique)（发明于1980年代的时间管理技巧）。
 
-A typical **pomodoro** (Italian for "tomato") technique consists of:
+一整套番茄钟流程一般长这样：
 
-| Session | Duration |
+| 专注/休息 | 时长 |
 |---------|----------|
-| Focus   | 25 min   |
-| Short Break | 5 min |
-| Focus   | 25 min   |
-| Short Break | 5 min |
-| Focus   | 25 min   |
-| Short Break | 5 min |
-| Focus   | 25 min   |
-| Long Break | 15 min |
+| 专注   | 25 min   |
+| 短休息 | 5 min |
+| 专注   | 25 min   |
+| 短休息 | 5 min |
+| 专注   | 25 min   |
+| 短休息 | 5 min |
+| 专注   | 25 min   |
+| 长休息 | 15 min |
 
 ---
 
-## ⏰ Features
+## ⏰ 功能
 
-- Pomodoro focus timer (with cool animations!)
-- Focus session presets (Focus/Deep Work/Quick)
-- Statistics page (track your progress, stats, and streaks!)
-- Mini Player (floats on top of windows for quick viewing)
-- Full customization (including: theme color, zen background music, auto-start breaks, etc.)
-- Todo-list support (add, edit, delete, and check your todo items!)
-- AI Insights (on-device productivity analysis, smart session suggestions, and focus quality scores)
+- 番茄钟计时器（有超酷的动画！）
+- 专注模式预设：Focus（正常专注）、Deep Work（深度工作）、和 Quick（快速）
+- AI 分析（可以帮你系统分析**你**独特的专注黄金时间段、专注质量等！）
+- 专注统计（记录你的专注流程、数据、和连胜次数）
+- 迷你播放器（浮动在你的其他窗口上，方便查看）
+- 支持各方面DIY（主题色、氛围音乐、是否自动开始休息等）
+- 侧边栏等任务列表功能
 
----
-
-## 💡 What's New in v2.0
-
-### New Features
-
-**AI Insights**
-
-Tempo now analyzes your session history on-device to surface personalized productivity recommendations:
-- **Productivity Score** — a composite score based on completion rate, consistency, and interruptions
-- **Smart Suggestions** — recommends the best session length and time of day based on your patterns
-- **Focus Quality** — rates each session and tracks trends over time
-- **Insights cards** — surfaces your peak hours, streak milestones, zen music impact, and more
-- All analysis is 100% private and happens on your Mac — no data leaves your device
-
-**Expanded Zen Music Library**
-
-Two new ambient tracks added: *Zen Moods* and *Zen Garden* (joining the existing *Inner Peace*).
 
 ---
 
-## 🔨 Installation
+## 💡 v2.1.0 新功能
 
-### Download
 
-Download the `.dmg` file from the [latest release](https://github.com/your-repo/releases) and drag the app into the Applications folder
 
-OR
+---
 
-Install the app from the App Store:
+## 🔨 安装
+
+### 下载
+
+从[这里](https://github.com/backtosq1/Tempo/releases)下载.dmg磁盘印象并安装到“应用程序”文件夹中
+
+或
+
+从App Store直接下载：
 
 <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="140" height="40" alt="Download_on_the_Mac_App_Store_Badge_CNSC_RGB_wht_092917" src="https://github.com/user-attachments/assets/bed60738-7df6-43e1-b945-7caa5040c7c9" /></a>
+
+
 <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="156" height="40" alt="Download_on_the_Mac_App_Store_Badge_US-UK_RGB_wht_092917" src="https://github.com/user-attachments/assets/56268041-4729-42db-bb59-ac96374b8600"/></a>
 
 
-### 🔧 Required Permissions
+### 🔧 调试
 
-Grant the following permissions for full functionality:
-- **Accessibility** - For timer controls
-- **Notifications** - For focus session alerts
+需要以下权限保证正常使用（在系统设置中设置即可）：
+
+- **辅助功能** - 保证计时器运行
+- **通知** - 专注结束时及时通知
 
 ---
 
 ## 💬 FAQ
 
-**Q: Is Tempo free?**
+**Q: 使用Tempo要付钱吗?**
 
-A: Yes, Tempo is **100% free** and open-source.
+A: 不用。Tempo 是 **100% 免费** 且开源的。
 
-**Q: Notifications aren't working / features unavailable?**
+**Q: 接收不到通知 / 有些功能无法使用**
 
-A: Check that **accessibility** and **notification** permissions are enabled. Try restarting the app. If the issue persists, please open an issue in this repository.
+A: 检查系统设置中 **辅助功能** 和 **通知** 权限是否开启。试试重新开启app。如果问题仍然存在，可以在这个GitHub仓库开一个Issue。
 
-**Q: How can I contribute to this project?**
+**Q: 如何参与这个app的开发？**
 
-A: Fork this repository and submit a PR for us to review.
+A: Fork该仓库并提交PR
 
 ---
 
@@ -111,4 +107,4 @@ This project is licensed under the [MIT License](https://opensource.org/license/
 **Created by Huatao Xue**
 
 
-Pls leave a star! ⭐️ It motivates me a lot to make your experience better.
+点个星⭐️吧！这帮助我改善你的用户体验。

@@ -1,8 +1,9 @@
 # Tempo
 
-<div align="right">
+<div align="center">
   <a href="README.md">English</a> | <a href="README.zh-CN.md">简体中文</a>
 </div>
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/Version-2.1.0-red?style=for-the-badge" alt="Version">
@@ -49,22 +50,9 @@ A typical **pomodoro** (Italian for "tomato") technique consists of:
 
 ---
 
-## 💡 What's New in v2.0
+## 💡 What's New in v2.1.0
 
-### New Features
 
-**AI Insights**
-
-Tempo now analyzes your session history on-device to surface personalized productivity recommendations:
-- **Productivity Score** — a composite score based on completion rate, consistency, and interruptions
-- **Smart Suggestions** — recommends the best session length and time of day based on your patterns
-- **Focus Quality** — rates each session and tracks trends over time
-- **Insights cards** — surfaces your peak hours, streak milestones, zen music impact, and more
-- All analysis is 100% private and happens on your Mac — no data leaves your device
-
-**Expanded Zen Music Library**
-
-Two new ambient tracks added: *Zen Moods* and *Zen Garden* (joining the existing *Inner Peace*).
 
 ---
 
@@ -79,6 +67,8 @@ OR
 Install the app from the App Store:
 
 <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="140" height="40" alt="Download_on_the_Mac_App_Store_Badge_CNSC_RGB_wht_092917" src="https://github.com/user-attachments/assets/bed60738-7df6-43e1-b945-7caa5040c7c9" /></a>
+
+
 <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="156" height="40" alt="Download_on_the_Mac_App_Store_Badge_US-UK_RGB_wht_092917" src="https://github.com/user-attachments/assets/56268041-4729-42db-bb59-ac96374b8600"/></a>
 
 
