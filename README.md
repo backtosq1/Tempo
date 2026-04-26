@@ -1,5 +1,9 @@
 # Tempo
 
+<div align="right">
+  <a href="README.md">English</a> | <a href="README.zh-CN.md">简体中文</a>
+</div>
+
 <p align="center">
   <img src="https://img.shields.io/badge/Version-2.1.0-red?style=for-the-badge" alt="Version">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
