@@ -60,7 +60,7 @@ A typical **pomodoro** (Italian for "tomato") technique consists of:
 
 ### Download
 
-Download the `.dmg` file from the [latest release](https://github.com/your-repo/releases) and drag the app into the Applications folder
+Download the `.dmg` file from the [latest release](https://github.com/backtosq1/Tempo/releases) and drag the app into the Applications folder
 
 OR
 
