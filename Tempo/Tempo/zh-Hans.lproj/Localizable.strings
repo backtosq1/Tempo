@@ -13,16 +13,16 @@
 "onb.p1.body" = "专为学生的深度专注与习惯养成设计的番茄钟应用。";
 
 // 第2页 - 自定义方案
-"onb.p2.title" = "自定义专注方案";
-"onb.p2.body" = "选择内置预设（深度工作、快速冲刺），或完全自定义时长与颜色。";
+"onb.p2.title" = "自定义专注模式";
+"onb.p2.body" = "选择如Deep Work (深度工作）的预设，或完全自定义时长与主题色。";
 
 // 第3页 - 禅乐
-"onb.p3.title" = "禅乐助你专注";
+"onb.p3.title" = "氛围音乐助你专注";
 "onb.p3.body" = "开启内置氛围音乐（Inner Piece、Zen Moods、Zen Garden），打造无干扰的专注氛围。";
 
 // 第4页 - 智能洞察
-"onb.p4.title" = "了解你的智能洞察";
-"onb.p4.body" = "完成 10 次专注后，Tempo 分析你的规律——黄金专注时段、连续打卡动力、专注质量——并提供可执行建议。所有处理均在本地完成。";
+"onb.p4.title" = "了解你的AI模型";
+"onb.p4.body" = "积累一定次数的专注后，Tempo 会分析你的规律——黄金专注时段、连续打卡动力、专注质量——并提供可执行的建议。所有处理均在本地完成。";
 
 // 第5页 - 成就
 "onb.p5.title" = "解锁成就";
@@ -132,8 +132,8 @@
 "settings.appearance" = "外观";
 "settings.appearanceMode" = "外观模式";
 "settings.animationStyle" = "风格";
-"settings.keepThemeColor" = "切换方案时保持主题颜色";
-"settings.accentColor" = "强调色";
+"settings.keepThemeColor" = "切换专注模式时保持主题色";
+"settings.accentColor" = "主题色";
 "settings.language" = "语言";
 "settings.appLanguage" = "应用语言";
 "settings.languageNote" = "语言更改将在整个应用中生效。";

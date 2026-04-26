@@ -63,12 +63,13 @@ private struct LanguagePillButton: View {
             .padding(.vertical, 16)
             .background(
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(isSelected ? Color.red : Color.secondary.opacity(0.3), lineWidth: isSelected ? 2 : 1)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(isSelected ? Color.red.opacity(0.08) : Color.clear)
-                    )
+                    .fill(isSelected ? Color.red.opacity(0.08) : Color.clear)
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(isSelected ? Color.red : Color.secondary.opacity(0.3), lineWidth: isSelected ? 2 : 1)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
     }

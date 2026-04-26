@@ -19,7 +19,6 @@ struct SettingsView: View {
     @AppStorage(SettingsKeys.Appearance.overrideThemeColor.rawValue) private var overrideThemeColor = false
     @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme = "default"
     @AppStorage(SettingsKeys.Appearance.appAppearance.rawValue) private var appAppearance = "system"
-    @AppStorage(SettingsKeys.Appearance.animationStyle.rawValue) private var animationStyle = "smooth"
 
     @State private var showingResetConfirmation = false
     @State private var showingUpdateAlert = false
@@ -209,7 +208,21 @@ struct SettingsView: View {
                             }
                         }
 
-                        if currentTheme.locksAppearance {
+                        if currentTheme == .default {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(L("settings.appearanceMode"))
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(theme.textSecondary)
+
+                                Picker(L("settings.appearanceMode"), selection: $appAppearance) {
+                                    ForEach(AppAppearance.allCases, id: \.rawValue) { mode in
+                                        Text(mode.displayName).tag(mode.rawValue)
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                                .id(locManager.currentLanguage)
+                            }
+                        } else {
                             HStack(spacing: 6) {
                                 Image(systemName: currentTheme.forcesDarkMode ? "moon.fill" : "sun.max.fill")
                                     .font(.caption2)
@@ -223,42 +236,6 @@ struct SettingsView: View {
 
                 // Appearance
                 SettingsSection(title: L("settings.appearance"), icon: "paintbrush.fill", accentColor: accentColor, themeColors: theme) {
-                    // Appearance mode picker
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(L("settings.appearanceMode"))
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(theme.textSecondary)
-
-                        Picker("Appearance", selection: $appAppearance) {
-                            ForEach(AppAppearance.allCases, id: \.rawValue) { mode in
-                                Text(mode.displayName).tag(mode.rawValue)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .disabled(currentTheme.locksAppearance)
-                    }
-
-                    // Animation style picker
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(L("settings.animationStyle"))
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(theme.textSecondary)
-
-                        Picker("Animation", selection: $animationStyle) {
-                            ForEach(AnimationStyle.allCases, id: \.rawValue) { style in
-                                Text(style.displayName).tag(style.rawValue)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-
-                    ToggleRow(
-                        icon: "lock.fill",
-                        label: L("settings.keepThemeColor"),
-                        isOn: $overrideThemeColor,
-                        accentColor: accentColor
-                    )
-
                     VStack(alignment: .leading, spacing: 12) {
                         Text(L("settings.accentColor"))
                             .font(.system(size: 14, weight: .medium))
@@ -280,6 +257,14 @@ struct SettingsView: View {
                         .padding(.top, 4)
                     }
                     .padding(.vertical, 8)
+                    
+                
+                        ToggleRow(
+                            icon: "lock.fill",
+                            label: L("settings.keepThemeColor"),
+                            isOn: $overrideThemeColor,
+                            accentColor: accentColor
+                        )
                 }
 
                 // Language
@@ -403,7 +388,20 @@ struct SettingsView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                         */
-                        
+
+                        Button(action: {
+                            UserDefaults.standard.set(false, forKey: SettingsKeys.Onboarding.hasCompletedOnboarding.rawValue)
+                        }) {
+                            HStack {
+                                Image(systemName: "person.crop.circle.badge.questionmark")
+                                    .foregroundColor(accentColor)
+                                Text("Test Onboarding")
+                                    .foregroundColor(accentColor)
+                                Spacer()
+                            }
+                            .padding(.vertical, 8)
+                        }
+                        .buttonStyle(PlainButtonStyle())
 
                         Button(action: {
                             showingClearAIConfirmation = true

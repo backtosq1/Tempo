@@ -9,7 +9,6 @@ struct TimerView: View {
     @AppStorage(SettingsKeys.Timer.longBreakDuration.rawValue) private var longBreakDuration = 15
     @AppStorage(SettingsKeys.Behavior.enableZenMusic.rawValue) private var enableZenMusic = false
     @AppStorage(SettingsKeys.Appearance.appTheme.rawValue) private var appTheme = "default"
-    @AppStorage(SettingsKeys.Appearance.animationStyle.rawValue) private var animationStyle = "smooth"
     
     @StateObject private var zenPlayer = ZenMusicPlayer.shared
     @ObservedObject private var locManager = LocalizationManager.shared
@@ -200,7 +199,7 @@ struct TimerView: View {
                 .tracking(1.5)
                 .scaleEffect(showModeTransition ? 1.2 : 1)
                 .opacity(showModeTransition ? 0 : 1)
-                .animation(AnimationProvider.spring(for: animationStyle), value: showModeTransition)
+                .animation(.spring(response: 0.5, dampingFraction: 0.7), value: showModeTransition)
             
             Text(timeString(from: timerManager.timeRemaining))
                 .font(.system(size: 56, weight: .bold, design: .rounded))
@@ -286,7 +285,7 @@ struct TimerView: View {
                     x: 0,
                     y: 0
                 )
-                .animation(AnimationProvider.springSlow(for: animationStyle), value: timerProgress)
+                .animation(.spring(response: 0.6, dampingFraction: 0.8), value: timerProgress)
             
             // Animated dashes for running timer
             if timerManager.state == .running {

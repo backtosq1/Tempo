@@ -19,7 +19,7 @@ enum SettingsKeys {
     
     enum Appearance: String, CaseIterable {
         case themeColor, overrideThemeColor, selectedTab
-        case appTheme, appAppearance, animationStyle
+        case appTheme, appAppearance
     }
     
     enum Session: String, CaseIterable {
@@ -124,11 +124,6 @@ final class SettingsStore: ObservableObject {
     var appAppearance: String {
         get { defaults.string(forKey: SettingsKeys.Appearance.appAppearance.rawValue) ?? "system" }
         set { defaults.set(newValue, forKey: SettingsKeys.Appearance.appAppearance.rawValue) }
-    }
-
-    var animationStyle: String {
-        get { defaults.string(forKey: SettingsKeys.Appearance.animationStyle.rawValue) ?? "smooth" }
-        set { defaults.set(newValue, forKey: SettingsKeys.Appearance.animationStyle.rawValue) }
     }
 
     // MARK: Session Settings
@@ -690,53 +685,5 @@ enum ThemeManager {
     static func colors(for themeRawValue: String, accent: Color) -> ThemeColors {
         let theme = AppTheme(rawValue: themeRawValue) ?? .default
         return theme.colors(accent: accent)
-    }
-}
-
-// MARK: - Animation Style
-
-enum AnimationStyle: String, CaseIterable {
-    case smooth, snappy, gentle
-
-    var displayName: String {
-        switch self {
-        case .smooth: return L("animation.smooth")
-        case .snappy: return L("animation.snappy")
-        case .gentle: return L("animation.gentle")
-        }
-    }
-}
-
-// MARK: - Animation Provider
-
-enum AnimationProvider {
-    /// Standard interaction spring (button taps, selections, toggles)
-    static func spring(for styleRaw: String) -> Animation {
-        let style = AnimationStyle(rawValue: styleRaw) ?? .smooth
-        switch style {
-        case .smooth: return .spring(response: 0.5, dampingFraction: 0.7)
-        case .snappy: return .spring(response: 0.25, dampingFraction: 0.8)
-        case .gentle: return .spring(response: 0.8, dampingFraction: 0.6)
-        }
-    }
-
-    /// Quick feedback (button press, scale bounce)
-    static func springFast(for styleRaw: String) -> Animation {
-        let style = AnimationStyle(rawValue: styleRaw) ?? .smooth
-        switch style {
-        case .smooth: return .spring(response: 0.3, dampingFraction: 0.7)
-        case .snappy: return .spring(response: 0.15, dampingFraction: 0.85)
-        case .gentle: return .spring(response: 0.5, dampingFraction: 0.65)
-        }
-    }
-
-    /// Larger transitions (card entrance, mode change, page transitions)
-    static func springSlow(for styleRaw: String) -> Animation {
-        let style = AnimationStyle(rawValue: styleRaw) ?? .smooth
-        switch style {
-        case .smooth: return .spring(response: 0.6, dampingFraction: 0.8)
-        case .snappy: return .spring(response: 0.35, dampingFraction: 0.85)
-        case .gentle: return .spring(response: 1.0, dampingFraction: 0.65)
-        }
     }
 }
