@@ -1,19 +1,14 @@
 # Tempo
 
-<div align="center">
-  <a href="README.md">English</a> | <a href="README.zh-CN.md">简体中文</a>
-</div>
+[English](README.md) | [简体中文](README.zh-CN.md)
 
+![](https://img.shields.io/badge/Version-2.0.1-red?style=for-the-badge)
+![](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+![](https://img.shields.io/badge/Platform-macOS-black?style=for-the-badge) 
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-2.1.0-red?style=for-the-badge" alt="Version">
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
-  <img src="https://img.shields.io/badge/Platform-macOS-black?style=for-the-badge" alt="Platform">
   <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="156" height="40" alt="Download_on_the_Mac_App_Store_Badge_US-UK_RGB_wht_092917" src="https://github.com/user-attachments/assets/56268041-4729-42db-bb59-ac96374b8600"/></a>
-</p>
-
-<p align="center">
-  <strong>A focus timer for students.</strong><br>
+  <strong>All-in-1 pomodoro focus app for students</strong><br>
   Level up your work with a customizable systematic focus routine, AI-powered focus recommendations, productivity statistics, and more!
 </p>
 
@@ -45,14 +40,27 @@ A typical **pomodoro** (Italian for "tomato") technique consists of:
 - Statistics page (track your progress, stats, and streaks!)
 - Mini Player (floats on top of windows for quick viewing)
 - Full customization (including: theme color, zen background music, auto-start breaks, etc.)
-- Todo-list support (add, edit, delete, and check your todo items!)
+- Todo-list support (add, edit, sort, delete, and check your todo items!)
 - AI Insights (on-device productivity analysis, smart session suggestions, and focus quality scores)
 
 ---
 
-## 💡 What's New in v2.1.0
+## 💡 What's New in v2.0.1
 
+**Improved onboarding**
 
+- Onboarding page with introduction to features
+- Offers choosing a language on first startup
+- Requests for Accessibility & Notifications permissions
+
+**Chinese localization**
+
+- Full-app Simplified Chinese localization
+- Added language settings
+
+**Todo improvements**
+
+- Added sorting feature for todos (based on priority or due date)
 
 ---
 

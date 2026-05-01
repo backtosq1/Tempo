@@ -1,19 +1,14 @@
 # Tempo
 
-<div align="center">
-  <a href="README.md">English</a> | <a href="README.zh-CN.md">简体中文</a>
-</div>
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-<br>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/版本-2.1.0-red?style=for-the-badge" alt="Version">
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
-  <img src="https://img.shields.io/badge/平台-macOS-black?style=for-the-badge" alt="Platform"> <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="140" height="40" alt="Download_on_the_Mac_App_Store_Badge_CNSC_RGB_wht_092917" src="https://github.com/user-attachments/assets/bed60738-7df6-43e1-b945-7caa5040c7c9" /></a></p>
-</p>
+![](https://img.shields.io/badge/版本-2.0.1-red?style=for-the-badge)
+![](https://img.shields.io/badge/许可证-MIT-blue?style=for-the-badge)
+![](https://img.shields.io/badge/平台-macOS-black?style=for-the-badge) 
 
 <p align="center">
-  <strong>专为学生的深度专注与习惯养成设计的番茄钟应用。</strong><br>
+  <a href="https://apps.apple.com/cn/app/tempo-pomodoro-focus-timer/id6760688795?l=en-GB&mt=12"><img width="156" height="40" alt="Download_on_the_Mac_App_Store_Badge_US-UK_RGB_wht_092917" src="https://github.com/user-attachments/assets/56268041-4729-42db-bb59-ac96374b8600"/></a>
+  <strong>多功能番茄钟专注应用，专为学生打造</strong><br>
   可自定义的系统化专注流程、AI 模型分析、专注数据等帮你 level up 专注效率！
 </p>
 
@@ -51,9 +46,22 @@ Tempo 使用了备受欢迎的[番茄钟技巧](https://en.wikipedia.org/wiki/Po
 
 ---
 
-## 💡 v2.1.0 新功能
+## 💡 v2.0.1 新功能
 
+**增加初始化界面**
 
+- 介绍Tempo所有功能的初始化界面
+- 初次使用可设置语言
+- 询问是否为Tempo打开辅助功能和通知设置
+
+**支持中文**
+
+- 整个应用现在均支持简体中文
+- 添加语言设置
+
+**改进任务列表**
+
+- 添加任务排序功能（可根据任务优先级或截止日期排序）
 
 ---
 
