@@ -50,9 +50,14 @@
 "sidebar.tasks.completed" = "Completed";
 "sidebar.tasks.clear" = "Clear";
 "sidebar.miniPlayer" = "Mini Player";
+"sidebar.tasks.sortByPriority" = "Sort by Priority";
+"sidebar.tasks.sortByDate" = "Sort by Due Date";
 "sidebar.tasks.setDueDate" = "Set Due Date";
 "sidebar.tasks.changeDueDate" = "Change Due Date";
 "sidebar.tasks.removeDueDate" = "Remove Due Date";
+"sidebar.tasks.low" = "Low";
+"sidebar.tasks.med" = "Medium";
+"sidebar.tasks.high" = "High";
 "sidebar.tasks.edit" = "Edit";
 "sidebar.tasks.delete" = "Delete";
 

@@ -27,9 +27,21 @@ struct SidebarView: View {
     @State private var showTaskHint: Bool = false
     @State private var draggingTodo: TodoItem? = nil
     @State private var showCompleted: Bool = false
+    
+    @State private var todoSortOrder: TodoSortOrder = .importance
 
     private var incompleteTodos: [TodoItem] {
-        todos.filter { !$0.isCompleted }
+        let filtered = todos.filter { !$0.isCompleted }
+        switch todoSortOrder {
+        case .importance:
+            return filtered.sorted { $0.priority > $1.priority }
+        case .dueDate:
+            return filtered.sorted { todo1, todo2 in
+                guard let date1 = todo1.dueDate else { return false }
+                guard let date2 = todo2.dueDate else { return true }
+                return date1 < date2
+            }
+        }
     }
 
     private var completedTodos: [TodoItem] {
@@ -77,15 +89,18 @@ struct SidebarView: View {
         )
         .onAppear {
             loadTodos()
+            todoSortOrder = settings.todoSortOrder
         }
     }
     
     private func loadTodos() {
         todos = settings.todos
+        todoSortOrder = settings.todoSortOrder
     }
     
     private func saveTodos() {
         settings.todos = todos
+        settings.todoSortOrder = todoSortOrder
         timerManager.reloadTodos()
     }
     
@@ -289,6 +304,21 @@ struct SidebarView: View {
                 }
 
                 Spacer()
+                
+                Menu {
+                    Button(action: { todoSortOrder = .importance }) {
+                        Label(L("sidebar.tasks.sortByPriority"), systemImage: todoSortOrder == .importance ? "checkmark" : "")
+                    }
+                    Button(action: { todoSortOrder = .dueDate }) {
+                        Label(L("sidebar.tasks.sortByDate"), systemImage: todoSortOrder == .dueDate ? "checkmark" : "")
+                    }
+                } label: {
+                    Image(systemName: "arrow.up.arrow.down")
+                        .font(.system(size: 10))
+                        .foregroundColor(theme.textSecondary.opacity(0.6))
+                }
+                .menuStyle(.borderlessButton)
+                .frame(width: 20)
 
                 Button(action: { showTaskHint.toggle() }) {
                     Image(systemName: "questionmark.circle")
@@ -342,7 +372,7 @@ struct SidebarView: View {
                                     Circle()
                                         .fill(priority.color)
                                         .frame(width: 6, height: 6)
-                                    Text(priority == .medium ? "Med" : priority.rawValue.capitalized)
+                                    Text(priority == .low ? L("sidebar.tasks.low") : priority == .medium ? L("sidebar.tasks.med") : L("sidebar.tasks.high"))
                                         .font(.system(size: 10, weight: newTodoPriority == priority ? .semibold : .regular))
                                         .fixedSize()
                                 }
@@ -791,7 +821,7 @@ struct TodoRow: View {
                             ForEach(Priority.allCases, id: \.self) { priority in
                                 Button(action: { onChangePriority(priority) }) {
                                     HStack {
-                                        Text(priority.rawValue.capitalized)
+                                        Text(priority == .low ? L("sidebar.tasks.low") : priority == .medium ? L("sidebar.tasks.med") : L("sidebar.tasks.high"))
                                         if todo.priority == priority {
                                             Image(systemName: "checkmark")
                                         }

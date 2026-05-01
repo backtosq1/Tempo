@@ -23,7 +23,7 @@ enum SettingsKeys {
     }
     
     enum Session: String, CaseIterable {
-        case currentSessionName, customSessions, todos, activeTaskId
+        case currentSessionName, customSessions, todos, activeTaskId, todoSortOrder
     }
     
     enum Stats: String, CaseIterable {
@@ -191,6 +191,17 @@ final class SettingsStore: ObservableObject {
                 defaults.set(data, forKey: SettingsKeys.Session.todos.rawValue)
             }
         }
+    }
+    
+    var todoSortOrder: TodoSortOrder {
+        get {
+            guard let rawValue = defaults.string(forKey: SettingsKeys.Session.todoSortOrder.rawValue),
+                  let sortOrder = TodoSortOrder(rawValue: rawValue) else {
+                return .importance
+            }
+            return sortOrder
+        }
+        set { defaults.set(newValue.rawValue, forKey: SettingsKeys.Session.todoSortOrder.rawValue) }
     }
 
     // MARK: Session History
@@ -375,6 +386,13 @@ enum Priority: String, Codable, CaseIterable, Comparable {
         case .high: return .red
         }
     }
+}
+
+// MARK: - Todo Sort Order
+
+enum TodoSortOrder: String, Codable, CaseIterable {
+    case importance = "Importance"
+    case dueDate = "Due Date"
 }
 
 // MARK: - Todo Item

@@ -50,9 +50,14 @@
 "sidebar.tasks.completed" = "已完成";
 "sidebar.tasks.clear" = "清除";
 "sidebar.miniPlayer" = "迷你播放器";
+"sidebar.tasks.sortByPriority" = "按优先排序";
+"sidebar.tasks.sortByDate" = "按截止日期排序";
 "sidebar.tasks.setDueDate" = "设置截止日期";
 "sidebar.tasks.changeDueDate" = "更改截止日期";
 "sidebar.tasks.removeDueDate" = "移除截止日期";
+"sidebar.tasks.low" = "次要";
+"sidebar.tasks.med" = "重要";
+"sidebar.tasks.high" = "优先";
 "sidebar.tasks.edit" = "编辑";
 "sidebar.tasks.delete" = "删除";
 
