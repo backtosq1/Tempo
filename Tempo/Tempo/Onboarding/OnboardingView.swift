@@ -5,7 +5,7 @@ struct OnboardingView: View {
     @ObservedObject private var locManager = LocalizationManager.shared
     @State private var currentPage = 0
 
-    private let totalFeaturePages = 5
+    private let totalFeaturePages = 6
 
     var body: some View {
         ZStack {
@@ -26,6 +26,8 @@ struct OnboardingView: View {
                 Group {
                     if currentPage == 0 {
                         LanguagePickerView(onContinue: { withAnimation { currentPage = 1 } })
+                    } else if currentPage == totalFeaturePages {
+                        OnboardingPermissionsPage()
                     } else {
                         OnboardingFeaturePage(pageIndex: currentPage)
                     }

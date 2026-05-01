@@ -28,6 +28,15 @@
 "onb.p5.title" = "Earn Achievements";
 "onb.p5.body" = "From \"First Focus\" to \"Zen Master\" and \"Week Warrior\" — milestones celebrate your consistency and keep you motivated.";
 
+// Page 6 - Permissions
+"onb.perms.title" = "Enable Permissions";
+"onb.perms.body" = "Tempo works best with these permissions. You can always change them later in System Settings.";
+"onb.perms.notif.title" = "Notifications";
+"onb.perms.notif.detail" = "Get alerted when your focus session or break ends.";
+"onb.perms.access.title" = "Accessibility";
+"onb.perms.access.detail" = "Allows global keyboard shortcuts to control the timer.";
+"onb.perms.allow" = "Allow";
+
 // Navigation
 "onb.nav.next" = "Next";
 "onb.nav.back" = "Back";

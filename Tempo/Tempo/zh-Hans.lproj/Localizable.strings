@@ -28,6 +28,15 @@
 "onb.p5.title" = "解锁成就";
 "onb.p5.body" = "从「初次专注」到「禅定大师」和「周卡战士」——里程碑见证你的坚持，激励你继续前行。";
 
+// 第6页 - 权限
+"onb.perms.title" = "开启权限";
+"onb.perms.body" = "以下权限可让 Tempo 发挥最佳效果，你随时可以在系统设置中更改。";
+"onb.perms.notif.title" = "通知";
+"onb.perms.notif.detail" = "专注或休息结束时收到提醒。";
+"onb.perms.access.title" = "辅助功能";
+"onb.perms.access.detail" = "允许使用全局键盘快捷键控制计时器。";
+"onb.perms.allow" = "允许";
+
 // 导航
 "onb.nav.next" = "下一步";
 "onb.nav.back" = "返回";
